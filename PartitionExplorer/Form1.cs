@@ -15,6 +15,7 @@ namespace PartitionExplorer
     {
         private string path_;
         Dictionary<String, float> sizeDictionary = new Dictionary<string, float>();
+        private ListViewItemComparer lvSorter = new ListViewItemComparer();
 
         public Form1(string path)
         {
@@ -29,31 +30,56 @@ namespace PartitionExplorer
         {
             lvCurrentFolder.Tag = DI;
             lblPath.Text = DI.FullName;
-            lvCurrentFolder.Items.Clear();
-            ListViewItem lvi;
-
-            if (DI.Parent != null)
+            lvCurrentFolder.BeginUpdate();
+            try
             {
-                lvi = new ListViewItem("..", 0);
-                lvi.Tag = DI.Parent;
-                lvi.ToolTipText = DI.Name;
-                lvCurrentFolder.Items.Add(lvi);
+                lvCurrentFolder.ListViewItemSorter = null;
+                lvCurrentFolder.Items.Clear();
+                ListViewItem lvi;
+
+                if (DI.Parent != null)
+                {
+                    lvi = new ListViewItem("..", 0);
+                    lvi.Tag = DI.Parent;
+                    lvi.ToolTipText = DI.Name;
+                    lvCurrentFolder.Items.Add(lvi);
+                }
+
+                foreach (DirectoryInfo item in DI.EnumerateDirectories())
+                {
+                    lvi = new ListViewItem(item.Name, 0);
+                    float dirSize = DirectorySize(item);
+                    lvi.SubItems.Add(SizeInAppropriateFormat(dirSize)).Tag = dirSize;
+                    lvi.Tag = item;
+                    lvCurrentFolder.Items.Add(lvi);
+                }
+
+                foreach (FileInfo item in DI.GetFiles())
+                {
+                    lvi = new ListViewItem(item.Name, 1);
+                    lvi.SubItems.Add(SizeInAppropriateFormat(item.Length)).Tag = (float)item.Length;
+                    lvi.Tag = item;
+                    lvCurrentFolder.Items.Add(lvi);
+                }
+
+                if (lvSorter.SortColumn >= 0)
+                    lvCurrentFolder.ListViewItemSorter = lvSorter;
             }
-
-            foreach (DirectoryInfo item in DI.EnumerateDirectories())
+            finally
             {
-                lvi = new ListViewItem(item.Name, 0);
-                lvi.SubItems.Add(SizeInAppropriateFormat(DirectorySize(item)));
-                lvi.Tag = item;
-                lvCurrentFolder.Items.Add(lvi);
+                lvCurrentFolder.EndUpdate();
             }
+        }
 
-            foreach (FileInfo item in DI.GetFiles())
+        private void UpdateSortIndicators()
+        {
+            string[] titles = { "Name", "Size" };
+            for (int i = 0; i < lvCurrentFolder.Columns.Count && i < titles.Length; i++)
             {
-                lvi = new ListViewItem(item.Name, 1);
-                lvi.SubItems.Add(SizeInAppropriateFormat(item.Length));
-                lvi.Tag = item;
-                lvCurrentFolder.Items.Add(lvi);
+                string title = titles[i];
+                if (i == lvSorter.SortColumn)
+                    title += lvSorter.Order == SortOrder.Ascending ? " \u25B2" : " \u25BC";
+                lvCurrentFolder.Columns[i].Text = title;
             }
         }
 
@@ -232,6 +258,25 @@ namespace PartitionExplorer
             }
         }
 
+        private void lvCurrentFolder_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            if (e.Column == lvSorter.SortColumn)
+            {
+                lvSorter.Order = lvSorter.Order == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending;
+            }
+            else
+            {
+                lvSorter.SortColumn = e.Column;
+                // Size is most useful largest-first; Name starts A-Z
+                lvSorter.Order = e.Column == 1 ? SortOrder.Descending : SortOrder.Ascending;
+            }
+            UpdateSortIndicators();
+            if (lvCurrentFolder.ListViewItemSorter == null)
+                lvCurrentFolder.ListViewItemSorter = lvSorter;
+            else
+                lvCurrentFolder.Sort();
+        }
+
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             sizeDictionary.Clear();            
@@ -253,6 +298,50 @@ namespace PartitionExplorer
         }
         #endregion
 
+        // Sorts by Name (column 0) or Size in bytes (column 1).
+        // ".." always stays on top and folders always come before files.
+        private class ListViewItemComparer : System.Collections.IComparer
+        {
+            public int SortColumn = -1;
+            public SortOrder Order = SortOrder.Ascending;
+
+            public int Compare(object x, object y)
+            {
+                ListViewItem a = (ListViewItem)x;
+                ListViewItem b = (ListViewItem)y;
+
+                int rankA = Rank(a), rankB = Rank(b);
+                if (rankA != rankB)
+                    return rankA.CompareTo(rankB);
+
+                int result;
+                if (SortColumn == 1)
+                {
+                    result = SizeOf(a).CompareTo(SizeOf(b));
+                    if (result == 0)
+                        result = String.Compare(a.Text, b.Text, StringComparison.CurrentCultureIgnoreCase);
+                }
+                else
+                {
+                    result = String.Compare(a.Text, b.Text, StringComparison.CurrentCultureIgnoreCase);
+                }
+                return Order == SortOrder.Descending ? -result : result;
+            }
+
+            private static int Rank(ListViewItem item)
+            {
+                if (item.Text == "..")
+                    return 0;
+                return item.Tag is FileInfo ? 2 : 1;
+            }
+
+            private static float SizeOf(ListViewItem item)
+            {
+                if (item.SubItems.Count > 1 && item.SubItems[1].Tag is float)
+                    return (float)item.SubItems[1].Tag;
+                return 0;
+            }
+        }
     }
 
 
