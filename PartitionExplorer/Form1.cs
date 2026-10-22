@@ -14,8 +14,14 @@ namespace PartitionExplorer
     public partial class Form1 : Form
     {
         private string path_;
-        Dictionary<String, float> sizeDictionary = new Dictionary<string, float>();
+        // Only touched by the scan worker while it runs, and by the UI thread otherwise
+        Dictionary<String, FolderSize> sizeDictionary = new Dictionary<string, FolderSize>();
         private ListViewItemComparer lvSorter = new ListViewItemComparer();
+        private BackgroundWorker scanWorker = new BackgroundWorker();
+        private FolderScan currentScan;
+        private DirectoryInfo pendingScan;
+        private bool pendingClearCache;
+        private int lastProgressTick;
 
         public Form1(string path)
         {
@@ -23,11 +29,17 @@ namespace PartitionExplorer
             path_ = path;
             if (path_ == "") path_ =Microsoft.VisualBasic.FileIO.SpecialDirectories.MyDocuments;
 
+            scanWorker.WorkerReportsProgress = true;
+            scanWorker.WorkerSupportsCancellation = true;
+            scanWorker.DoWork += scanWorker_DoWork;
+            scanWorker.ProgressChanged += scanWorker_ProgressChanged;
+            scanWorker.RunWorkerCompleted += scanWorker_RunWorkerCompleted;
         }
 
         #region Functions
-        private void BindListView(DirectoryInfo DI)
+        private void BindListView(FolderScan scan)
         {
+            DirectoryInfo DI = scan.Folder;
             lvCurrentFolder.Tag = DI;
             lblPath.Text = DI.FullName;
             lvCurrentFolder.BeginUpdate();
@@ -45,20 +57,29 @@ namespace PartitionExplorer
                     lvCurrentFolder.Items.Add(lvi);
                 }
 
-                foreach (DirectoryInfo item in DI.EnumerateDirectories())
+                foreach (ScanEntry entry in scan.Folders)
                 {
-                    lvi = new ListViewItem(item.Name, 0);
-                    float dirSize = DirectorySize(item);
-                    lvi.SubItems.Add(SizeInAppropriateFormat(dirSize)).Tag = dirSize;
-                    lvi.Tag = item;
+                    lvi = new ListViewItem(entry.Info.Name, 0);
+                    if (entry.IsLink)
+                    {
+                        lvi.SubItems.Add("link").Tag = 0L;
+                        lvi.ToolTipText = "Junction or symbolic link. Its target is not counted here.";
+                    }
+                    else
+                    {
+                        lvi.SubItems.Add(SizeInAppropriateFormat(entry.Size) + (entry.Partial ? "*" : "")).Tag = entry.Size;
+                        if (entry.Partial)
+                            lvi.ToolTipText = "Some subfolders could not be read, so this size is a minimum.";
+                    }
+                    lvi.Tag = entry.Info;
                     lvCurrentFolder.Items.Add(lvi);
                 }
 
-                foreach (FileInfo item in DI.GetFiles())
+                foreach (ScanEntry entry in scan.Files)
                 {
-                    lvi = new ListViewItem(item.Name, 1);
-                    lvi.SubItems.Add(SizeInAppropriateFormat(item.Length)).Tag = (float)item.Length;
-                    lvi.Tag = item;
+                    lvi = new ListViewItem(entry.Info.Name, 1);
+                    lvi.SubItems.Add(SizeInAppropriateFormat(entry.Size)).Tag = entry.Size;
+                    lvi.Tag = entry.Info;
                     lvCurrentFolder.Items.Add(lvi);
                 }
 
@@ -83,23 +104,25 @@ namespace PartitionExplorer
             }
         }
 
-        private void BindChart(DirectoryInfo DI)
+        private void BindChart(FolderScan scan)
         {
+            DirectoryInfo DI = scan.Folder;
             chart1.Series[0].Points.Clear();
             DataPoint dp;
-            foreach (DirectoryInfo d in DI.GetDirectories())
+            foreach (ScanEntry entry in scan.Folders)
             {
+                if (entry.IsLink)
+                    continue;
                 dp = new DataPoint();
-                float size = DirectorySize(d);
-                dp.Label = NameInAppropriateFormat(d.Name) + " " + SizeInAppropriateFormat(size);
-                dp.LabelToolTip = d.Name;
-                dp.SetValueY(size);
+                dp.Label = NameInAppropriateFormat(entry.Info.Name) + " " + SizeInAppropriateFormat(entry.Size);
+                dp.LabelToolTip = entry.Info.Name;
+                dp.SetValueY(entry.Size);
                 chart1.Series[0].Points.Add(dp);
             }
-            float FileSize = 0;
-            foreach (FileInfo f in DI.GetFiles())
+            long FileSize = 0;
+            foreach (ScanEntry entry in scan.Files)
             {
-                FileSize += f.Length;
+                FileSize += entry.Size;
             }
             dp = new DataPoint();
             dp.Label = NameInAppropriateFormat("Files") + " " + SizeInAppropriateFormat(FileSize);
@@ -127,59 +150,139 @@ namespace PartitionExplorer
             return p;
         }
 
-        private string SizeInAppropriateFormat(float size)
+        private string SizeInAppropriateFormat(long size)
         {
-            string result = "";
-            float K = 1024;
+            string[] units = { "KB", "MB", "GB", "TB", "PB" };
             if (size < 1024)
-                result = size.ToString() + " B";
-            else if ((size / K) < 1024)
-                result = (size / K).ToString("0.00") + " KB";
-            else if ((size / (K * K)) < 1024)
-                result = (size / (K * K)).ToString("0.00") + " MB";
-            else if ((size / (K * K * K)) < 1024)
-                result = (size / (K * K * K)).ToString("0.00") + " GB";
+                return size.ToString() + " B";
+            double value = size;
+            int unit = -1;
+            while (value >= 1024 && unit < units.Length - 1)
+            {
+                value /= 1024;
+                unit++;
+            }
+            return value.ToString("0.00") + " " + units[unit];
+        }
+
+        private static bool IsLink(DirectoryInfo DI)
+        {
+            return (DI.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint;
+        }
+
+        // Runs on the scan worker. Junctions and symbolic links are skipped so their
+        // targets are not counted twice and cycles cannot happen.
+        private FolderSize DirectorySize(DirectoryInfo DI, BackgroundWorker worker)
+        {
+            FolderSize cached;
+            if (sizeDictionary.TryGetValue(DI.FullName, out cached))
+                return cached;
+
+            if (worker.CancellationPending)
+                throw new OperationCanceledException();
+
+            int now = Environment.TickCount;
+            if (now - lastProgressTick > 100)
+            {
+                lastProgressTick = now;
+                worker.ReportProgress(0, DI.FullName);
+            }
+
+            FolderSize result = new FolderSize();
+            try
+            {
+                foreach (DirectoryInfo d in DI.EnumerateDirectories())
+                {
+                    if (IsLink(d))
+                        continue;
+                    FolderSize sub = DirectorySize(d, worker);
+                    result.Size += sub.Size;
+                    result.Partial |= sub.Partial;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!IsAccessError(ex)) throw;
+                result.Partial = true;
+            }
+            try
+            {
+                foreach (FileInfo f in DI.EnumerateFiles())
+                {
+                    result.Size += f.Length;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!IsAccessError(ex)) throw;
+                result.Partial = true;
+            }
+
+            sizeDictionary[DI.FullName] = result;
             return result;
         }
 
-        private float DirectorySize(DirectoryInfo DI)
+        private static bool IsAccessError(Exception ex)
         {
-            if (sizeDictionary.ContainsKey(DI.FullName))
-            {
-                return sizeDictionary[DI.FullName];
-            }
-            else
-            {
-                float size = 0;
-                try
-                {
-
-                    if (DI.GetDirectories().Count<DirectoryInfo>() > 0)
-                        foreach (DirectoryInfo d in DI.GetDirectories())
-                        {
-                            size += DirectorySize(d);
-                        }
-                }
-                catch (Exception)
-                {
-
-                }
-                try
-                {
-                    foreach (FileInfo f in DI.GetFiles())
-                    {
-                        size += f.Length;
-                    }
-                }
-                catch (Exception)
-                {
-
-                }
-
-                sizeDictionary.Add(DI.FullName, size);
-                return size;
-            }
+            return ex is UnauthorizedAccessException || ex is IOException || ex is System.Security.SecurityException;
         }
+
+        // Runs on the scan worker. Errors reading the folder itself propagate, so the
+        // previous view stays on screen and the user sees why.
+        private FolderScan ScanFolder(DirectoryInfo DI, BackgroundWorker worker)
+        {
+            FolderScan scan = new FolderScan();
+            scan.Folder = DI;
+            foreach (DirectoryInfo d in DI.GetDirectories())
+            {
+                ScanEntry entry = new ScanEntry();
+                entry.Info = d;
+                entry.IsLink = IsLink(d);
+                if (!entry.IsLink)
+                {
+                    FolderSize size = DirectorySize(d, worker);
+                    entry.Size = size.Size;
+                    entry.Partial = size.Partial;
+                    scan.Partial |= size.Partial;
+                }
+                scan.Folders.Add(entry);
+            }
+            foreach (FileInfo f in DI.GetFiles())
+            {
+                ScanEntry entry = new ScanEntry();
+                entry.Info = f;
+                try
+                {
+                    entry.Size = f.Length;
+                }
+                catch (Exception ex)
+                {
+                    if (!IsAccessError(ex)) throw;
+                    entry.Partial = true;
+                }
+                scan.Files.Add(entry);
+            }
+            return scan;
+        }
+
+        private void StartScan(DirectoryInfo DI, bool clearCache)
+        {
+            if (scanWorker.IsBusy)
+            {
+                // Restart with the new folder once the running scan has stopped
+                pendingScan = DI;
+                pendingClearCache |= clearCache;
+                scanWorker.CancelAsync();
+                return;
+            }
+            if (clearCache)
+                sizeDictionary.Clear();
+            lblStatus.Text = "Scanning " + DI.FullName;
+            progressScan.Visible = true;
+            lnkCancel.Visible = true;
+            scanWorker.RunWorkerAsync(DI);
+        }
+
         #endregion
 
         #region Control Events
@@ -209,34 +312,18 @@ namespace PartitionExplorer
                 }
             }
 
-            try
-            {
-                BindListView(new DirectoryInfo(path_));
-                BindChart(new DirectoryInfo(path_));
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
+            StartScan(new DirectoryInfo(path_), false);
         }
 
         private void cmbPartition_SelectedIndexChanged(object sender, EventArgs e)
         {
-            DirectoryInfo DI = ((DriveInfo)cmbPartition.SelectedItem).RootDirectory;
-            BindListView(DI);
-            BindChart(DI);
+            StartScan(((DriveInfo)cmbPartition.SelectedItem).RootDirectory, false);
         }
 
         private void chbShowFreeSpace_CheckedChanged(object sender, EventArgs e)
         {
-            if (lvCurrentFolder.Tag != null)
-            {
-                DirectoryInfo DI = (DirectoryInfo)lvCurrentFolder.Tag;
-                BindListView(DI);
-                BindChart(DI);
-            }
-
+            if (currentScan != null)
+                BindChart(currentScan);
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -246,16 +333,11 @@ namespace PartitionExplorer
 
         private void lvCurrentFolder_DoubleClick(object sender, EventArgs e)
         {
-            try
-            {
-                DirectoryInfo DI = (DirectoryInfo)lvCurrentFolder.SelectedItems[0].Tag;
-                BindListView(DI);
-                BindChart(DI);
-            }
-            catch (Exception)
-            {
-
-            }
+            if (lvCurrentFolder.SelectedItems.Count == 0)
+                return;
+            DirectoryInfo DI = lvCurrentFolder.SelectedItems[0].Tag as DirectoryInfo;
+            if (DI != null)
+                StartScan(DI, false);
         }
 
         private void lvCurrentFolder_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -279,16 +361,74 @@ namespace PartitionExplorer
 
         private void btnRefresh_Click(object sender, EventArgs e)
         {
-            sizeDictionary.Clear();            
+            DirectoryInfo DI = pendingScan ?? lvCurrentFolder.Tag as DirectoryInfo ?? new DirectoryInfo(path_);
+            StartScan(DI, true);
+        }
+
+        private void lnkCancel_Click(object sender, EventArgs e)
+        {
+            pendingScan = null;
+            scanWorker.CancelAsync();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            pendingScan = null;
+            scanWorker.CancelAsync();
+        }
+
+        private void scanWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
             try
             {
-                DirectoryInfo DI = (DirectoryInfo)lvCurrentFolder.Tag;
-                BindListView(DI);
-                BindChart(DI);
+                e.Result = ScanFolder((DirectoryInfo)e.Argument, (BackgroundWorker)sender);
             }
-            catch (Exception)
+            catch (OperationCanceledException)
             {
+                e.Cancel = true;
+            }
+        }
 
+        private void scanWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            lblStatus.Text = "Scanning " + (string)e.UserState;
+        }
+
+        private void scanWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (IsDisposed)
+                return;
+
+            if (pendingScan != null)
+            {
+                DirectoryInfo next = pendingScan;
+                bool clear = pendingClearCache;
+                pendingScan = null;
+                pendingClearCache = false;
+                StartScan(next, clear);
+                return;
+            }
+
+            progressScan.Visible = false;
+            lnkCancel.Visible = false;
+
+            if (e.Error != null)
+            {
+                lblStatus.Text = "Could not open folder";
+                MessageBox.Show(e.Error.Message);
+            }
+            else if (e.Cancelled)
+            {
+                lblStatus.Text = "Scan cancelled";
+            }
+            else
+            {
+                currentScan = (FolderScan)e.Result;
+                BindListView(currentScan);
+                BindChart(currentScan);
+                lblStatus.Text = currentScan.Partial
+                    ? "Some folders could not be read. Sizes marked * are minimums."
+                    : "Ready";
             }
         }
 
@@ -335,12 +475,34 @@ namespace PartitionExplorer
                 return item.Tag is FileInfo ? 2 : 1;
             }
 
-            private static float SizeOf(ListViewItem item)
+            private static long SizeOf(ListViewItem item)
             {
-                if (item.SubItems.Count > 1 && item.SubItems[1].Tag is float)
-                    return (float)item.SubItems[1].Tag;
+                if (item.SubItems.Count > 1 && item.SubItems[1].Tag is long)
+                    return (long)item.SubItems[1].Tag;
                 return 0;
             }
+        }
+
+        private class FolderSize
+        {
+            public long Size;
+            public bool Partial;
+        }
+
+        private class ScanEntry
+        {
+            public FileSystemInfo Info;
+            public long Size;
+            public bool Partial;
+            public bool IsLink;
+        }
+
+        private class FolderScan
+        {
+            public DirectoryInfo Folder;
+            public List<ScanEntry> Folders = new List<ScanEntry>();
+            public List<ScanEntry> Files = new List<ScanEntry>();
+            public bool Partial;
         }
     }
 
