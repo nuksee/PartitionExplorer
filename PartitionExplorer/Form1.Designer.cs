@@ -118,6 +118,7 @@
             this.lvCurrentFolder.TabIndex = 1;
             this.lvCurrentFolder.UseCompatibleStateImageBehavior = false;
             this.lvCurrentFolder.DoubleClick += new System.EventHandler(this.lvCurrentFolder_DoubleClick);
+            this.lvCurrentFolder.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvCurrentFolder_ColumnClick);
             // 
             // columnHeader1
             // 
