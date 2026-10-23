@@ -12,7 +12,8 @@
   The Store signs the package itself, so upload packaging\out\*.msix unsigned.
 
 .PARAMETER IdentityName
-  Package/Identity/Name from Partner Center.
+  Package/Identity/Name from Partner Center. The defaults are the reserved
+  PartitionExplorer Store identity.
 .PARAMETER Publisher
   Package/Identity/Publisher from Partner Center, e.g. "CN=1A2B3C4D-...".
 .PARAMETER PublisherDisplayName
@@ -22,13 +23,13 @@
   This needs Developer Mode (Settings > System > For developers).
 
 .EXAMPLE
+  .\packaging\build-msix.ps1
   .\packaging\build-msix.ps1 -Register
-  .\packaging\build-msix.ps1 -IdentityName 12345Kaveh.PartitionExplorer -Publisher "CN=..." -PublisherDisplayName Kaveh
 #>
 param(
-    [string]$IdentityName = "PartitionExplorer.Dev",
-    [string]$Publisher = "CN=PartitionExplorerDev",
-    [string]$PublisherDisplayName = "PartitionExplorer (dev)",
+    [string]$IdentityName = "KavehS.PartitionExplorer",
+    [string]$Publisher = "CN=7D19368D-3BF0-4C71-8177-4B4DC476B0C3",
+    [string]$PublisherDisplayName = "Kaveh S",
     [string]$SdkBuildToolsVersion = "10.0.26100.1742",
     [switch]$Register
 )
