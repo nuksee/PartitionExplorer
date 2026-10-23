@@ -116,5 +116,35 @@ namespace PartitionExplorer.Properties
                 this["SplitterDistance"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int ChartMode
+        {
+            get
+            {
+                return ((int)(this["ChartMode"]));
+            }
+            set
+            {
+                this["ChartMode"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ChartSplitterDistance
+        {
+            get
+            {
+                return ((int)(this["ChartSplitterDistance"]));
+            }
+            set
+            {
+                this["ChartSplitterDistance"] = value;
+            }
+        }
     }
 }

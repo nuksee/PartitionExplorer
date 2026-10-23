@@ -33,6 +33,16 @@ namespace PartitionExplorer
         private const string ExplorerMenuKey = @"Software\Classes\Directory\shell\OpenInPartitionExplorer";
         private const uint SHOP_FILEPATH = 0x2;
 
+        // Shared by the donut and the treemap so a folder has the same colour in both
+        private static readonly Color[] Palette = {
+            Color.FromArgb(78, 121, 167), Color.FromArgb(242, 142, 43), Color.FromArgb(89, 161, 79),
+            Color.FromArgb(225, 87, 89), Color.FromArgb(118, 183, 178), Color.FromArgb(237, 201, 72),
+            Color.FromArgb(176, 122, 161), Color.FromArgb(255, 157, 167), Color.FromArgb(156, 117, 95),
+            Color.FromArgb(186, 176, 172) };
+        private static readonly Color OtherColor = Color.FromArgb(156, 156, 156);
+        private static readonly Color FreeColor = Color.FromArgb(222, 222, 222);
+        private Dictionary<string, Color> colorMap = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase);
+
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
         private static extern bool SHObjectProperties(IntPtr hwnd, uint shopObjectType, string pszObjectName, string pszPropertyPage);
 
@@ -44,6 +54,7 @@ namespace PartitionExplorer
                 path_ = Properties.Settings.Default.LastFolder;
             if (path_ == "") path_ =Microsoft.VisualBasic.FileIO.SpecialDirectories.MyDocuments;
 
+            treemap1.TagEquals = SameTag;
             scanWorker.WorkerReportsProgress = true;
             scanWorker.WorkerSupportsCancellation = true;
             scanWorker.DoWork += scanWorker_DoWork;
@@ -86,7 +97,7 @@ namespace PartitionExplorer
                     }
                     else
                     {
-                        lvi.SubItems.Add(SizeInAppropriateFormat(entry.Size) + (entry.Partial ? "*" : "")).Tag = entry.Size;
+                        lvi.SubItems.Add(FormatSize(entry.Size) + (entry.Partial ? "*" : "")).Tag = entry.Size;
                         lvi.SubItems.Add(PercentText(entry.Size, total)).Tag = entry.Size;
                         lvi.SubItems.Add(entry.Count.ToString("N0") + (entry.Partial ? "*" : "")).Tag = entry.Count;
                         if (entry.Partial)
@@ -100,7 +111,7 @@ namespace PartitionExplorer
                 foreach (ScanEntry entry in scan.Files)
                 {
                     lvi = new ListViewItem(entry.Info.Name, 1);
-                    lvi.SubItems.Add(SizeInAppropriateFormat(entry.Size)).Tag = entry.Size;
+                    lvi.SubItems.Add(FormatSize(entry.Size)).Tag = entry.Size;
                     lvi.SubItems.Add(PercentText(entry.Size, total)).Tag = entry.Size;
                     lvi.SubItems.Add("").Tag = 0L;
                     lvi.SubItems.Add(entry.Info.LastWriteTime.ToString("g")).Tag = entry.Info.LastWriteTime;
@@ -185,14 +196,81 @@ namespace PartitionExplorer
         private DataPoint MakePoint(string name, long size, object tag)
         {
             DataPoint dp = new DataPoint();
-            dp.Label = NameInAppropriateFormat(name) + " " + SizeInAppropriateFormat(size);
+            dp.Label = NameInAppropriateFormat(name) + " " + FormatSize(size);
             dp.LabelToolTip = name;
             dp.SetValueY(size);
             dp.Tag = tag;
+            dp.Color = name == "Free" ? FreeColor : ColorFor(tag);
             return dp;
         }
 
-        // Pulls out the slice for the selected row: its folder, or "Files" for a file
+        private static string ColorKey(object tag)
+        {
+            DirectoryInfo DI = tag as DirectoryInfo;
+            return DI != null ? DI.FullName : tag as string;
+        }
+
+        private Color ColorFor(object tag)
+        {
+            Color c;
+            string key = ColorKey(tag);
+            return key != null && colorMap.TryGetValue(key, out c) ? c : OtherColor;
+        }
+
+        // Largest first, so the biggest items get the most distinct colours
+        private void AssignColors(FolderScan scan)
+        {
+            colorMap.Clear();
+            List<KeyValuePair<string, long>> keyed = scan.Folders.Where(f => !f.IsLink)
+                .Select(f => new KeyValuePair<string, long>(f.Info.FullName, f.Size)).ToList();
+            keyed.Add(new KeyValuePair<string, long>("Files", scan.Files.Sum(f => f.Size)));
+            int i = 0;
+            foreach (KeyValuePair<string, long> k in keyed.OrderByDescending(k => k.Value))
+                colorMap[k.Key] = Palette[i++ % Palette.Length];
+        }
+
+        private void BindTreemap(FolderScan scan)
+        {
+            List<TreemapControl.Item> items = new List<TreemapControl.Item>();
+            foreach (ScanEntry entry in scan.Folders)
+            {
+                if (entry.IsLink)
+                    continue;
+                TreemapControl.Item item = new TreemapControl.Item { Name = entry.Info.Name, Size = entry.Size, Tag = entry.Info, Color = ColorFor(entry.Info) };
+                foreach (ScanEntry child in entry.Children)
+                    item.Children.Add(new TreemapControl.Item { Name = child.Info != null ? child.Info.Name : "(files)", Size = child.Size, Tag = child.Info });
+                items.Add(item);
+            }
+            long fileSize = scan.Files.Sum(f => f.Size);
+            items.Add(new TreemapControl.Item { Name = "Files", Size = fileSize, Tag = "Files", Color = ColorFor("Files") });
+            treemap1.SetItems(items);
+        }
+
+        private static bool SameTag(object a, object b)
+        {
+            string ka = ColorKey(a), kb = ColorKey(b);
+            return ka != null && String.Equals(ka, kb, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void SetChartMode(int mode)
+        {
+            splitCharts.Panel1Collapsed = mode == 1;
+            splitCharts.Panel2Collapsed = mode == 0;
+        }
+
+        private int ChartMode
+        {
+            get { return rbDonut.Checked ? 0 : rbTreemap.Checked ? 1 : 2; }
+            set
+            {
+                RadioButton rb = value == 0 ? rbDonut : value == 1 ? rbTreemap : rbBoth;
+                rb.Checked = true;
+                SetChartMode(value);
+            }
+        }
+
+        // Pulls out the slice for the selected row (its folder, or "Files" for a file)
+        // and outlines the matching treemap box
         private void HighlightSelectedSlice()
         {
             object selected = null;
@@ -208,6 +286,7 @@ namespace PartitionExplorer
                         : selected is DirectoryInfo && ((DirectoryInfo)p.Tag).FullName == ((DirectoryInfo)selected).FullName);
                 p["Exploded"] = match ? "true" : "false";
             }
+            treemap1.SelectedTag = selected;
         }
 
         private static string PercentText(long size, long total)
@@ -226,7 +305,7 @@ namespace PartitionExplorer
             return p;
         }
 
-        private string SizeInAppropriateFormat(long size)
+        internal static string FormatSize(long size)
         {
             string[] units = { "KB", "MB", "GB", "TB", "PB" };
             if (size < 1024)
@@ -287,6 +366,7 @@ namespace PartitionExplorer
                 foreach (FileInfo f in DI.EnumerateFiles())
                 {
                     result.Size += f.Length;
+                    result.FileSize += f.Length;
                     result.Count++;
                 }
             }
@@ -323,6 +403,7 @@ namespace PartitionExplorer
                     entry.Count = size.Count;
                     entry.Partial = size.Partial;
                     scan.Partial |= size.Partial;
+                    AddChildren(entry, d, size);
                 }
                 scan.Folders.Add(entry);
             }
@@ -342,6 +423,26 @@ namespace PartitionExplorer
                 scan.Files.Add(entry);
             }
             return scan;
+        }
+
+        // Runs on the scan worker after DirectorySize, so every subfolder size is already cached
+        private void AddChildren(ScanEntry entry, DirectoryInfo DI, FolderSize size)
+        {
+            try
+            {
+                foreach (DirectoryInfo d in DI.EnumerateDirectories())
+                {
+                    FolderSize sub;
+                    if (!IsLink(d) && sizeDictionary.TryGetValue(d.FullName, out sub))
+                        entry.Children.Add(new ScanEntry { Info = d, Size = sub.Size });
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!IsAccessError(ex)) throw;
+            }
+            if (size.FileSize > 0)
+                entry.Children.Add(new ScanEntry { Size = size.FileSize });
         }
 
         private void StartScan(DirectoryInfo DI, NavKind nav, bool clearCache)
@@ -503,6 +604,9 @@ namespace PartitionExplorer
                 if (settings.ViewIndex >= 0 && settings.ViewIndex < cmbViews.Items.Count)
                     cmbViews.SelectedIndex = settings.ViewIndex;
                 chbShowFreeSpace.Checked = settings.ShowFreeSpace;
+                ChartMode = settings.ChartMode;
+                if (settings.ChartSplitterDistance > 0 && settings.ChartSplitterDistance < splitCharts.Width - splitCharts.Panel2MinSize)
+                    splitCharts.SplitterDistance = settings.ChartSplitterDistance;
                 chbExplorerMenu.Checked = ExplorerMenuInstalled();
             }
             finally
@@ -519,6 +623,9 @@ namespace PartitionExplorer
             settings.SplitterDistance = splitContainer1.SplitterDistance;
             settings.ViewIndex = cmbViews.SelectedIndex;
             settings.ShowFreeSpace = chbShowFreeSpace.Checked;
+            settings.ChartMode = ChartMode;
+            if (!splitCharts.Panel1Collapsed && !splitCharts.Panel2Collapsed)
+                settings.ChartSplitterDistance = splitCharts.SplitterDistance;
             if (currentScan != null)
                 settings.LastFolder = currentScan.Folder.FullName;
             settings.Save();
@@ -673,6 +780,19 @@ namespace PartitionExplorer
             DirectoryInfo DI = FolderAt(e.Location);
             if (DI != null)
                 NavigateTo(DI);
+        }
+
+        private void treemap1_ItemClicked(object sender, object tag)
+        {
+            DirectoryInfo DI = tag as DirectoryInfo;
+            if (DI != null)
+                NavigateTo(DI);
+        }
+
+        private void rbChartMode_CheckedChanged(object sender, EventArgs e)
+        {
+            if (((RadioButton)sender).Checked)
+                SetChartMode(ChartMode);
         }
 
         private void chart1_MouseMove(object sender, MouseEventArgs e)
@@ -858,8 +978,10 @@ namespace PartitionExplorer
                 UpdateHistory(scan);
                 currentScan = scan;
                 UpdateNavButtons();
+                AssignColors(currentScan);
                 BindListView(currentScan);
                 BindChart(currentScan);
+                BindTreemap(currentScan);
                 lblStatus.Text = currentScan.Partial
                     ? "Some folders could not be read. Sizes marked * are minimums."
                     : "Ready";
@@ -919,6 +1041,7 @@ namespace PartitionExplorer
         private class FolderSize
         {
             public long Size;
+            public long FileSize;
             public long Count;
             public bool Partial;
         }
@@ -930,6 +1053,8 @@ namespace PartitionExplorer
             public long Count;
             public bool Partial;
             public bool IsLink;
+            // One level of subfolders (plus a null-Info entry for the folder's own files), for the treemap
+            public List<ScanEntry> Children = new List<ScanEntry>();
         }
 
         private class FolderScan
