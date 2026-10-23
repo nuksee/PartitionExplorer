@@ -49,6 +49,19 @@ namespace PartitionExplorer
         [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
         private static extern int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        private static extern int GetCurrentPackageFullName(ref int packageFullNameLength, System.Text.StringBuilder packageFullName);
+
+        private const int APPMODEL_ERROR_NO_PACKAGE = 15700;
+
+        // True when running from the MSIX (Store) package. Its registry writes are
+        // virtualized, so the Explorer menu entry can't be registered from there.
+        private static bool IsPackaged()
+        {
+            int length = 0;
+            return GetCurrentPackageFullName(ref length, null) != APPMODEL_ERROR_NO_PACKAGE;
+        }
+
         public Form1(string path)
         {
             InitializeComponent();
@@ -614,7 +627,10 @@ namespace PartitionExplorer
                 ChartMode = settings.ChartMode;
                 if (settings.ChartSplitterDistance > 0 && settings.ChartSplitterDistance < splitCharts.Width - splitCharts.Panel2MinSize)
                     splitCharts.SplitterDistance = settings.ChartSplitterDistance;
-                chbExplorerMenu.Checked = ExplorerMenuInstalled();
+                if (IsPackaged())
+                    chbExplorerMenu.Visible = false;
+                else
+                    chbExplorerMenu.Checked = ExplorerMenuInstalled();
             }
             finally
             {

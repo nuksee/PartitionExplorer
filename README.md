@@ -38,6 +38,16 @@ dotnet build PartitionExplorer.sln -c Release
 
 The app lands in `PartitionExplorer\bin\Release\net8.0-windows\`. You can also open `PartitionExplorer.sln` in Visual Studio 2022 and build from there.
 
+### Microsoft Store package
+
+`packaging\build-msix.ps1` builds the MSIX package for the Microsoft Store into `packaging\out\`. It publishes the app self-contained, so Store users don't need the .NET runtime, and downloads `makeappx` from NuGet, so no Windows SDK install is needed. Pass the identity values from Partner Center (**Product identity**) for a Store upload:
+
+```
+.\packaging\build-msix.ps1 -IdentityName <Package/Identity/Name> -Publisher "<Package/Identity/Publisher>" -PublisherDisplayName "<Publisher display name>"
+```
+
+To try the package locally, turn on Developer Mode (Settings > System > For developers) and run `.\packaging\build-msix.ps1 -Register`. The Store build doesn't offer the folder right-click menu checkbox, because packaged apps can't write that registry entry.
+
 ## Running and sharing
 
 Start `PartitionExplorer.exe` from the release folder. To open a specific folder right away, pass it on the command line:
