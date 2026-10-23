@@ -51,12 +51,27 @@
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.progressScan = new System.Windows.Forms.ToolStripProgressBar();
             this.lnkCancel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.ctxItem = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mnuOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuShowInExplorer = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuCopyPath = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.mnuDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.mnuProperties = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnBack = new System.Windows.Forms.Button();
+            this.btnForward = new System.Windows.Forms.Button();
+            this.chbExplorerMenu = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            this.ctxItem.SuspendLayout();
             this.SuspendLayout();
             // 
             // chart1
@@ -73,9 +88,8 @@
             this.chart1.Name = "chart1";
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Doughnut;
-            series1.CustomProperties = "PieLineColor=Black, PieDrawingStyle=Concave, CollectedSliceExploded=True, Collect" +
-                "edLegendText=, CollectedLabel=Other, PieLabelStyle=Outside, CollectedThreshold=5" +
-                ", LabelsRadialLineSize=0";
+            series1.CustomProperties = "PieLineColor=Black, PieDrawingStyle=Concave, PieLabelStyle=Outside, LabelsRadialLin" +
+                "eSize=0";
             series1.IsValueShownAsLabel = true;
             series1.Legend = "Legend1";
             series1.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Square;
@@ -86,6 +100,8 @@
             this.chart1.Series.Add(series1);
             this.chart1.Size = new System.Drawing.Size(520, 507);
             this.chart1.TabIndex = 0;
+            this.chart1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseClick);
+            this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
             // 
             // label1
             // 
@@ -112,7 +128,11 @@
             this.lvCurrentFolder.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.lvCurrentFolder.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
-            this.columnHeader2});
+            this.columnHeader2,
+            this.columnHeader3,
+            this.columnHeader4,
+            this.columnHeader5});
+            this.lvCurrentFolder.ContextMenuStrip = this.ctxItem;
             this.lvCurrentFolder.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lvCurrentFolder.LargeImageList = this.imageList1;
             this.lvCurrentFolder.Location = new System.Drawing.Point(0, 0);
@@ -124,6 +144,8 @@
             this.lvCurrentFolder.TabIndex = 1;
             this.lvCurrentFolder.UseCompatibleStateImageBehavior = false;
             this.lvCurrentFolder.DoubleClick += new System.EventHandler(this.lvCurrentFolder_DoubleClick);
+            this.lvCurrentFolder.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lvCurrentFolder_KeyDown);
+            this.lvCurrentFolder.SelectedIndexChanged += new System.EventHandler(this.lvCurrentFolder_SelectedIndexChanged);
             this.lvCurrentFolder.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.lvCurrentFolder_ColumnClick);
             // 
             // columnHeader1
@@ -134,6 +156,86 @@
             // columnHeader2
             // 
             this.columnHeader2.Text = "Size";
+            this.columnHeader2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.columnHeader2.Width = 75;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "%";
+            this.columnHeader3.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.columnHeader3.Width = 55;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Items";
+            this.columnHeader4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.columnHeader4.Width = 65;
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "Modified";
+            this.columnHeader5.Width = 110;
+            // 
+            // ctxItem
+            // 
+            this.ctxItem.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuOpen,
+            this.mnuShowInExplorer,
+            this.mnuCopyPath,
+            this.toolStripSeparator1,
+            this.mnuDelete,
+            this.toolStripSeparator2,
+            this.mnuProperties});
+            this.ctxItem.Name = "ctxItem";
+            this.ctxItem.Size = new System.Drawing.Size(181, 126);
+            this.ctxItem.Opening += new System.ComponentModel.CancelEventHandler(this.ctxItem_Opening);
+            // 
+            // mnuOpen
+            // 
+            this.mnuOpen.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.mnuOpen.Name = "mnuOpen";
+            this.mnuOpen.Size = new System.Drawing.Size(180, 22);
+            this.mnuOpen.Text = "Open";
+            this.mnuOpen.Click += new System.EventHandler(this.mnuOpen_Click);
+            // 
+            // mnuShowInExplorer
+            // 
+            this.mnuShowInExplorer.Name = "mnuShowInExplorer";
+            this.mnuShowInExplorer.Size = new System.Drawing.Size(180, 22);
+            this.mnuShowInExplorer.Text = "Show in Explorer";
+            this.mnuShowInExplorer.Click += new System.EventHandler(this.mnuShowInExplorer_Click);
+            // 
+            // mnuCopyPath
+            // 
+            this.mnuCopyPath.Name = "mnuCopyPath";
+            this.mnuCopyPath.Size = new System.Drawing.Size(180, 22);
+            this.mnuCopyPath.Text = "Copy path";
+            this.mnuCopyPath.Click += new System.EventHandler(this.mnuCopyPath_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            // 
+            // mnuDelete
+            // 
+            this.mnuDelete.Name = "mnuDelete";
+            this.mnuDelete.ShortcutKeyDisplayString = "Del";
+            this.mnuDelete.Size = new System.Drawing.Size(180, 22);
+            this.mnuDelete.Text = "Delete to Recycle Bin";
+            this.mnuDelete.Click += new System.EventHandler(this.mnuDelete_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            // 
+            // mnuProperties
+            // 
+            this.mnuProperties.Name = "mnuProperties";
+            this.mnuProperties.Size = new System.Drawing.Size(180, 22);
+            this.mnuProperties.Text = "Properties";
+            this.mnuProperties.Click += new System.EventHandler(this.mnuProperties_Click);
             // 
             // imageList1
             // 
@@ -193,11 +295,44 @@
             // lblPath
             // 
             this.lblPath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblPath.Location = new System.Drawing.Point(139, 34);
+            this.lblPath.Location = new System.Drawing.Point(189, 34);
             this.lblPath.Name = "lblPath";
-            this.lblPath.ReadOnly = true;
-            this.lblPath.Size = new System.Drawing.Size(611, 20);
+            this.lblPath.Size = new System.Drawing.Size(561, 20);
             this.lblPath.TabIndex = 9;
+            this.lblPath.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lblPath_KeyDown);
+            // 
+            // btnBack
+            // 
+            this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBack.Location = new System.Drawing.Point(139, 33);
+            this.btnBack.Name = "btnBack";
+            this.btnBack.Size = new System.Drawing.Size(22, 22);
+            this.btnBack.TabIndex = 12;
+            this.btnBack.Text = "\u25C0";
+            this.btnBack.UseVisualStyleBackColor = true;
+            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
+            // 
+            // btnForward
+            // 
+            this.btnForward.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnForward.Location = new System.Drawing.Point(163, 33);
+            this.btnForward.Name = "btnForward";
+            this.btnForward.Size = new System.Drawing.Size(22, 22);
+            this.btnForward.TabIndex = 13;
+            this.btnForward.Text = "\u25B6";
+            this.btnForward.UseVisualStyleBackColor = true;
+            this.btnForward.Click += new System.EventHandler(this.btnForward_Click);
+            // 
+            // chbExplorerMenu
+            // 
+            this.chbExplorerMenu.AutoSize = true;
+            this.chbExplorerMenu.Location = new System.Drawing.Point(360, 10);
+            this.chbExplorerMenu.Name = "chbExplorerMenu";
+            this.chbExplorerMenu.Size = new System.Drawing.Size(212, 17);
+            this.chbExplorerMenu.TabIndex = 14;
+            this.chbExplorerMenu.Text = "Add to folder right-click menu";
+            this.chbExplorerMenu.UseVisualStyleBackColor = true;
+            this.chbExplorerMenu.CheckedChanged += new System.EventHandler(this.chbExplorerMenu_CheckedChanged);
             // 
             // btnOpenFolder
             // 
@@ -263,6 +398,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(810, 602);
             this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.chbExplorerMenu);
+            this.Controls.Add(this.btnForward);
+            this.Controls.Add(this.btnBack);
             this.Controls.Add(this.btnOpenFolder);
             this.Controls.Add(this.lblPath);
             this.Controls.Add(this.btnRefresh);
@@ -271,10 +409,12 @@
             this.Controls.Add(this.chbShowFreeSpace);
             this.Controls.Add(this.cmbPartition);
             this.Controls.Add(this.label1);
+            this.KeyPreview = true;
             this.Name = "Form1";
             this.Text = "Partition Explorer 1.0";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
@@ -282,6 +422,7 @@
             this.splitContainer1.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.ctxItem.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -307,6 +448,20 @@
         private System.Windows.Forms.ToolStripStatusLabel lblStatus;
         private System.Windows.Forms.ToolStripProgressBar progressScan;
         private System.Windows.Forms.ToolStripStatusLabel lnkCancel;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.ContextMenuStrip ctxItem;
+        private System.Windows.Forms.ToolStripMenuItem mnuOpen;
+        private System.Windows.Forms.ToolStripMenuItem mnuShowInExplorer;
+        private System.Windows.Forms.ToolStripMenuItem mnuCopyPath;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem mnuDelete;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem mnuProperties;
+        private System.Windows.Forms.Button btnBack;
+        private System.Windows.Forms.Button btnForward;
+        private System.Windows.Forms.CheckBox chbExplorerMenu;
     }
 }
 
