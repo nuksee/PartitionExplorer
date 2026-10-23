@@ -65,11 +65,22 @@
             this.btnBack = new System.Windows.Forms.Button();
             this.btnForward = new System.Windows.Forms.Button();
             this.chbExplorerMenu = new System.Windows.Forms.CheckBox();
+            this.pnlChartMode = new System.Windows.Forms.Panel();
+            this.rbDonut = new System.Windows.Forms.RadioButton();
+            this.rbTreemap = new System.Windows.Forms.RadioButton();
+            this.rbBoth = new System.Windows.Forms.RadioButton();
+            this.splitCharts = new System.Windows.Forms.SplitContainer();
+            this.treemap1 = new PartitionExplorer.TreemapControl();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.pnlChartMode.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitCharts)).BeginInit();
+            this.splitCharts.Panel1.SuspendLayout();
+            this.splitCharts.Panel2.SuspendLayout();
+            this.splitCharts.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.ctxItem.SuspendLayout();
             this.SuspendLayout();
@@ -98,7 +109,7 @@
             series1.ToolTip = "#VAL";
             series1.YValuesPerPoint = 2;
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(520, 507);
+            this.chart1.Size = new System.Drawing.Size(405, 539);
             this.chart1.TabIndex = 0;
             this.chart1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseClick);
             this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -276,10 +287,86 @@
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.chart1);
-            this.splitContainer1.Size = new System.Drawing.Size(786, 507);
+            this.splitContainer1.Panel2.Controls.Add(this.splitCharts);
+            this.splitContainer1.Panel2.Controls.Add(this.pnlChartMode);
+            this.splitContainer1.Size = new System.Drawing.Size(1076, 565);
             this.splitContainer1.SplitterDistance = 262;
             this.splitContainer1.TabIndex = 6;
+            // 
+            // pnlChartMode
+            // 
+            this.pnlChartMode.Controls.Add(this.rbDonut);
+            this.pnlChartMode.Controls.Add(this.rbTreemap);
+            this.pnlChartMode.Controls.Add(this.rbBoth);
+            this.pnlChartMode.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlChartMode.Location = new System.Drawing.Point(0, 0);
+            this.pnlChartMode.Name = "pnlChartMode";
+            this.pnlChartMode.Size = new System.Drawing.Size(810, 26);
+            this.pnlChartMode.TabIndex = 1;
+            // 
+            // rbDonut
+            // 
+            this.rbDonut.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rbDonut.Location = new System.Drawing.Point(3, 2);
+            this.rbDonut.Name = "rbDonut";
+            this.rbDonut.Size = new System.Drawing.Size(70, 22);
+            this.rbDonut.TabIndex = 0;
+            this.rbDonut.Text = "Donut";
+            this.rbDonut.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.rbDonut.UseVisualStyleBackColor = true;
+            this.rbDonut.CheckedChanged += new System.EventHandler(this.rbChartMode_CheckedChanged);
+            // 
+            // rbTreemap
+            // 
+            this.rbTreemap.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rbTreemap.Location = new System.Drawing.Point(75, 2);
+            this.rbTreemap.Name = "rbTreemap";
+            this.rbTreemap.Size = new System.Drawing.Size(70, 22);
+            this.rbTreemap.TabIndex = 1;
+            this.rbTreemap.Text = "Treemap";
+            this.rbTreemap.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.rbTreemap.UseVisualStyleBackColor = true;
+            this.rbTreemap.CheckedChanged += new System.EventHandler(this.rbChartMode_CheckedChanged);
+            // 
+            // rbBoth
+            // 
+            this.rbBoth.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rbBoth.Checked = true;
+            this.rbBoth.Location = new System.Drawing.Point(147, 2);
+            this.rbBoth.Name = "rbBoth";
+            this.rbBoth.Size = new System.Drawing.Size(70, 22);
+            this.rbBoth.TabIndex = 2;
+            this.rbBoth.TabStop = true;
+            this.rbBoth.Text = "Both";
+            this.rbBoth.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.rbBoth.UseVisualStyleBackColor = true;
+            this.rbBoth.CheckedChanged += new System.EventHandler(this.rbChartMode_CheckedChanged);
+            // 
+            // splitCharts
+            // 
+            this.splitCharts.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitCharts.Location = new System.Drawing.Point(0, 26);
+            this.splitCharts.Name = "splitCharts";
+            // 
+            // splitCharts.Panel1
+            // 
+            this.splitCharts.Panel1.Controls.Add(this.chart1);
+            // 
+            // splitCharts.Panel2
+            // 
+            this.splitCharts.Panel2.Controls.Add(this.treemap1);
+            this.splitCharts.Size = new System.Drawing.Size(810, 539);
+            this.splitCharts.SplitterDistance = 405;
+            this.splitCharts.TabIndex = 2;
+            // 
+            // treemap1
+            // 
+            this.treemap1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treemap1.Location = new System.Drawing.Point(0, 0);
+            this.treemap1.Name = "treemap1";
+            this.treemap1.Size = new System.Drawing.Size(401, 539);
+            this.treemap1.TabIndex = 0;
+            this.treemap1.ItemClicked += new System.EventHandler<object>(this.treemap1_ItemClicked);
             // 
             // cmbViews
             // 
@@ -294,10 +381,12 @@
             // 
             // lblPath
             // 
+            this.lblPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.lblPath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblPath.Location = new System.Drawing.Point(189, 34);
             this.lblPath.Name = "lblPath";
-            this.lblPath.Size = new System.Drawing.Size(561, 20);
+            this.lblPath.Size = new System.Drawing.Size(851, 20);
             this.lblPath.TabIndex = 9;
             this.lblPath.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lblPath_KeyDown);
             // 
@@ -336,9 +425,10 @@
             // 
             // btnOpenFolder
             // 
+            this.btnOpenFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOpenFolder.BackgroundImage = global::PartitionExplorer.Properties.Resources.open;
             this.btnOpenFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnOpenFolder.Location = new System.Drawing.Point(780, 33);
+            this.btnOpenFolder.Location = new System.Drawing.Point(1070, 33);
             this.btnOpenFolder.Name = "btnOpenFolder";
             this.btnOpenFolder.Size = new System.Drawing.Size(22, 22);
             this.btnOpenFolder.TabIndex = 10;
@@ -347,9 +437,10 @@
             // 
             // btnRefresh
             // 
+            this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRefresh.BackgroundImage = global::PartitionExplorer.Properties.Resources.refresh_over;
             this.btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRefresh.Location = new System.Drawing.Point(754, 33);
+            this.btnRefresh.Location = new System.Drawing.Point(1044, 33);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(22, 22);
             this.btnRefresh.TabIndex = 8;
@@ -362,15 +453,15 @@
             this.lblStatus,
             this.progressScan,
             this.lnkCancel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 580);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 638);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(810, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1100, 22);
             this.statusStrip1.TabIndex = 11;
             // 
             // lblStatus
             // 
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(795, 17);
+            this.lblStatus.Size = new System.Drawing.Size(1085, 17);
             this.lblStatus.Spring = true;
             this.lblStatus.Text = "Ready";
             this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -396,7 +487,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(810, 602);
+            this.ClientSize = new System.Drawing.Size(1100, 660);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.chbExplorerMenu);
             this.Controls.Add(this.btnForward);
@@ -420,6 +511,11 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.pnlChartMode.ResumeLayout(false);
+            this.splitCharts.Panel1.ResumeLayout(false);
+            this.splitCharts.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitCharts)).EndInit();
+            this.splitCharts.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.ctxItem.ResumeLayout(false);
@@ -462,6 +558,12 @@
         private System.Windows.Forms.Button btnBack;
         private System.Windows.Forms.Button btnForward;
         private System.Windows.Forms.CheckBox chbExplorerMenu;
+        private System.Windows.Forms.Panel pnlChartMode;
+        private System.Windows.Forms.RadioButton rbDonut;
+        private System.Windows.Forms.RadioButton rbTreemap;
+        private System.Windows.Forms.RadioButton rbBoth;
+        private System.Windows.Forms.SplitContainer splitCharts;
+        private PartitionExplorer.TreemapControl treemap1;
     }
 }
 
