@@ -52,6 +52,8 @@ namespace PartitionExplorer
         public Form1(string path)
         {
             InitializeComponent();
+            using (Stream iconStream = typeof(Form1).Assembly.GetManifestResourceStream("PartitionExplorer.PartitionExplorer.ico"))
+                if (iconStream != null) Icon = new Icon(iconStream);
             path_ = path;
             if (path_ == "" && Directory.Exists(Properties.Settings.Default.LastFolder))
                 path_ = Properties.Settings.Default.LastFolder;
