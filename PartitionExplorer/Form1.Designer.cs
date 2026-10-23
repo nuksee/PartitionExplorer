@@ -47,11 +47,16 @@
             this.lblPath = new System.Windows.Forms.TextBox();
             this.btnOpenFolder = new System.Windows.Forms.Button();
             this.btnRefresh = new System.Windows.Forms.Button();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.progressScan = new System.Windows.Forms.ToolStripProgressBar();
+            this.lnkCancel = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // chart1
@@ -114,6 +119,7 @@
             this.lvCurrentFolder.MultiSelect = false;
             this.lvCurrentFolder.Name = "lvCurrentFolder";
             this.lvCurrentFolder.Size = new System.Drawing.Size(262, 507);
+            this.lvCurrentFolder.ShowItemToolTips = true;
             this.lvCurrentFolder.SmallImageList = this.imageList2;
             this.lvCurrentFolder.TabIndex = 1;
             this.lvCurrentFolder.UseCompatibleStateImageBehavior = false;
@@ -215,11 +221,48 @@
             this.btnRefresh.UseVisualStyleBackColor = true;
             this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblStatus,
+            this.progressScan,
+            this.lnkCancel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 580);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(810, 22);
+            this.statusStrip1.TabIndex = 11;
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(795, 17);
+            this.lblStatus.Spring = true;
+            this.lblStatus.Text = "Ready";
+            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // progressScan
+            // 
+            this.progressScan.MarqueeAnimationSpeed = 30;
+            this.progressScan.Name = "progressScan";
+            this.progressScan.Size = new System.Drawing.Size(100, 16);
+            this.progressScan.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.progressScan.Visible = false;
+            // 
+            // lnkCancel
+            // 
+            this.lnkCancel.IsLink = true;
+            this.lnkCancel.Name = "lnkCancel";
+            this.lnkCancel.Size = new System.Drawing.Size(43, 17);
+            this.lnkCancel.Text = "Cancel";
+            this.lnkCancel.Visible = false;
+            this.lnkCancel.Click += new System.EventHandler(this.lnkCancel_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(810, 580);
+            this.ClientSize = new System.Drawing.Size(810, 602);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.btnOpenFolder);
             this.Controls.Add(this.lblPath);
             this.Controls.Add(this.btnRefresh);
@@ -231,11 +274,14 @@
             this.Name = "Form1";
             this.Text = "Partition Explorer 1.0";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -257,6 +303,10 @@
         private System.Windows.Forms.Button btnRefresh;
         private System.Windows.Forms.TextBox lblPath;
         private System.Windows.Forms.Button btnOpenFolder;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel lblStatus;
+        private System.Windows.Forms.ToolStripProgressBar progressScan;
+        private System.Windows.Forms.ToolStripStatusLabel lnkCancel;
     }
 }
 
