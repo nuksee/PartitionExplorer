@@ -26,5 +26,95 @@ namespace PartitionExplorer.Properties
                 return defaultInstance;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastFolder
+        {
+            get
+            {
+                return ((string)(this["LastFolder"]));
+            }
+            set
+            {
+                this["LastFolder"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int ViewIndex
+        {
+            get
+            {
+                return ((int)(this["ViewIndex"]));
+            }
+            set
+            {
+                this["ViewIndex"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowFreeSpace
+        {
+            get
+            {
+                return ((bool)(this["ShowFreeSpace"]));
+            }
+            set
+            {
+                this["ShowFreeSpace"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0, 0, 0, 0")]
+        public global::System.Drawing.Rectangle WindowBounds
+        {
+            get
+            {
+                return ((global::System.Drawing.Rectangle)(this["WindowBounds"]));
+            }
+            set
+            {
+                this["WindowBounds"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool WindowMaximized
+        {
+            get
+            {
+                return ((bool)(this["WindowMaximized"]));
+            }
+            set
+            {
+                this["WindowMaximized"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int SplitterDistance
+        {
+            get
+            {
+                return ((int)(this["SplitterDistance"]));
+            }
+            set
+            {
+                this["SplitterDistance"] = value;
+            }
+        }
     }
 }
