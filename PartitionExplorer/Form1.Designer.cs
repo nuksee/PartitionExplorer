@@ -365,7 +365,7 @@
             // 
             this.lblPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblPath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblPath.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.lblPath.Location = new System.Drawing.Point(189, 34);
             this.lblPath.Name = "lblPath";
             this.lblPath.Size = new System.Drawing.Size(851, 20);
@@ -374,6 +374,9 @@
             // 
             // btnBack
             // 
+            this.btnBack.FlatAppearance.BorderSize = 0;
+            this.btnBack.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(204, 228, 247);
+            this.btnBack.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(229, 241, 251);
             this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBack.Location = new System.Drawing.Point(139, 33);
             this.btnBack.Name = "btnBack";
@@ -385,6 +388,9 @@
             // 
             // btnForward
             // 
+            this.btnForward.FlatAppearance.BorderSize = 0;
+            this.btnForward.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(204, 228, 247);
+            this.btnForward.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(229, 241, 251);
             this.btnForward.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnForward.Location = new System.Drawing.Point(163, 33);
             this.btnForward.Name = "btnForward";
@@ -409,6 +415,10 @@
             // 
             this.btnOpenFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOpenFolder.BackgroundImage = global::PartitionExplorer.Properties.Resources.open;
+            this.btnOpenFolder.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnOpenFolder.FlatAppearance.BorderSize = 0;
+            this.btnOpenFolder.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(204, 228, 247);
+            this.btnOpenFolder.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(229, 241, 251);
             this.btnOpenFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnOpenFolder.Location = new System.Drawing.Point(1070, 33);
             this.btnOpenFolder.Name = "btnOpenFolder";
@@ -421,6 +431,10 @@
             // 
             this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRefresh.BackgroundImage = global::PartitionExplorer.Properties.Resources.refresh_over;
+            this.btnRefresh.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnRefresh.FlatAppearance.BorderSize = 0;
+            this.btnRefresh.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(204, 228, 247);
+            this.btnRefresh.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(229, 241, 251);
             this.btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRefresh.Location = new System.Drawing.Point(1044, 33);
             this.btnRefresh.Name = "btnRefresh";
