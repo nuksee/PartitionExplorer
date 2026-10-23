@@ -437,7 +437,8 @@ namespace PartitionExplorer
                 return;
             try
             {
-                System.Diagnostics.Process.Start(FI.FullName);
+                // .NET 8 no longer goes through the shell by default, which file associations need
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(FI.FullName) { UseShellExecute = true });
             }
             catch (Exception ex)
             {

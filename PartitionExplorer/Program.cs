@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -15,6 +16,8 @@ namespace PartitionExplorer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            // .NET 8 defaults to Segoe UI 9pt; keep the font the fixed layout was designed for
+            Application.SetDefaultFont(new Font("Microsoft Sans Serif", 8.25F));
             string path = "";
             if (args.Length == 0)
                 path = "";
