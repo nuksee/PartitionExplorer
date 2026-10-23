@@ -46,6 +46,9 @@ namespace PartitionExplorer
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
         private static extern bool SHObjectProperties(IntPtr hwnd, uint shopObjectType, string pszObjectName, string pszPropertyPage);
 
+        [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
+        private static extern int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
+
         public Form1(string path)
         {
             InitializeComponent();
@@ -57,6 +60,8 @@ namespace PartitionExplorer
             if (path_ == "") path_ =Microsoft.VisualBasic.FileIO.SpecialDirectories.MyDocuments;
 
             treemap1.TagEquals = SameTag;
+            lvCurrentFolder.SmallImageList = FlatIcons.Create(LogicalToDeviceUnits(16));
+            lvCurrentFolder.LargeImageList = FlatIcons.Create(LogicalToDeviceUnits(32));
             scanWorker.WorkerReportsProgress = true;
             scanWorker.WorkerSupportsCancellation = true;
             scanWorker.DoWork += scanWorker_DoWork;
@@ -79,7 +84,7 @@ namespace PartitionExplorer
 
                 if (DI.Parent != null)
                 {
-                    lvi = new ListViewItem("..", 0);
+                    lvi = new ListViewItem("..", FlatIcons.Folder);
                     lvi.Tag = DI.Parent;
                     lvi.ToolTipText = DI.Name;
                     lvCurrentFolder.Items.Add(lvi);
@@ -89,7 +94,7 @@ namespace PartitionExplorer
 
                 foreach (ScanEntry entry in scan.Folders)
                 {
-                    lvi = new ListViewItem(entry.Info.Name, 0);
+                    lvi = new ListViewItem(entry.Info.Name, FlatIcons.Folder);
                     if (entry.IsLink)
                     {
                         lvi.SubItems.Add("link").Tag = 0L;
@@ -112,7 +117,7 @@ namespace PartitionExplorer
 
                 foreach (ScanEntry entry in scan.Files)
                 {
-                    lvi = new ListViewItem(entry.Info.Name, 1);
+                    lvi = new ListViewItem(entry.Info.Name, FlatIcons.File);
                     lvi.SubItems.Add(FormatSize(entry.Size)).Tag = entry.Size;
                     lvi.SubItems.Add(PercentText(entry.Size, total)).Tag = entry.Size;
                     lvi.SubItems.Add("").Tag = 0L;
@@ -638,6 +643,9 @@ namespace PartitionExplorer
         #region Control Events
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Same list styling as File Explorer: light hover and selection, flat headers
+            SetWindowTheme(lvCurrentFolder.Handle, "Explorer", null);
+
             Dictionary<String, View> views = new Dictionary<string, View>();
             views.Add(View.Details.ToString(), View.Details);
             views.Add(View.LargeIcon.ToString(), View.LargeIcon);

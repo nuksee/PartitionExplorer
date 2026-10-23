@@ -32,15 +32,12 @@
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.label1 = new System.Windows.Forms.Label();
             this.cmbPartition = new System.Windows.Forms.ComboBox();
             this.lvCurrentFolder = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
-            this.imageList2 = new System.Windows.Forms.ImageList(this.components);
             this.chbShowFreeSpace = new System.Windows.Forms.CheckBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.cmbViews = new System.Windows.Forms.ComboBox();
@@ -88,7 +85,6 @@
             // chart1
             // 
             this.chart1.BackColor = System.Drawing.Color.Transparent;
-            this.chart1.BackHatchStyle = System.Windows.Forms.DataVisualization.Charting.ChartHatchStyle.BackwardDiagonal;
             chartArea1.Name = "ChartArea1";
             this.chart1.ChartAreas.Add(chartArea1);
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -99,8 +95,9 @@
             this.chart1.Name = "chart1";
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Doughnut;
-            series1.CustomProperties = "PieLineColor=Black, PieDrawingStyle=Concave, PieLabelStyle=Outside, LabelsRadialLin" +
-                "eSize=0";
+            series1.BorderColor = System.Drawing.Color.White;
+            series1.BorderWidth = 2;
+            series1.CustomProperties = "PieLineColor=Gray, PieLabelStyle=Outside, LabelsRadialLineSize=0";
             series1.IsValueShownAsLabel = true;
             series1.Legend = "Legend1";
             series1.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Square;
@@ -145,13 +142,12 @@
             this.columnHeader5});
             this.lvCurrentFolder.ContextMenuStrip = this.ctxItem;
             this.lvCurrentFolder.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvCurrentFolder.LargeImageList = this.imageList1;
+            this.lvCurrentFolder.FullRowSelect = true;
             this.lvCurrentFolder.Location = new System.Drawing.Point(0, 0);
             this.lvCurrentFolder.MultiSelect = false;
             this.lvCurrentFolder.Name = "lvCurrentFolder";
             this.lvCurrentFolder.Size = new System.Drawing.Size(262, 507);
             this.lvCurrentFolder.ShowItemToolTips = true;
-            this.lvCurrentFolder.SmallImageList = this.imageList2;
             this.lvCurrentFolder.TabIndex = 1;
             this.lvCurrentFolder.UseCompatibleStateImageBehavior = false;
             this.lvCurrentFolder.DoubleClick += new System.EventHandler(this.lvCurrentFolder_DoubleClick);
@@ -247,20 +243,6 @@
             this.mnuProperties.Size = new System.Drawing.Size(180, 22);
             this.mnuProperties.Text = "Properties";
             this.mnuProperties.Click += new System.EventHandler(this.mnuProperties_Click);
-            // 
-            // imageList1
-            // 
-            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
-            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList1.Images.SetKeyName(0, "folder.ico");
-            this.imageList1.Images.SetKeyName(1, "DOCL.ICO");
-            // 
-            // imageList2
-            // 
-            this.imageList2.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList2.ImageStream")));
-            this.imageList2.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList2.Images.SetKeyName(0, "folder.ico");
-            this.imageList2.Images.SetKeyName(1, "DOCL.ICO");
             // 
             // chbShowFreeSpace
             // 
@@ -383,7 +365,7 @@
             // 
             this.lblPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblPath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblPath.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.lblPath.Location = new System.Drawing.Point(189, 34);
             this.lblPath.Name = "lblPath";
             this.lblPath.Size = new System.Drawing.Size(851, 20);
@@ -392,6 +374,9 @@
             // 
             // btnBack
             // 
+            this.btnBack.FlatAppearance.BorderSize = 0;
+            this.btnBack.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(204, 228, 247);
+            this.btnBack.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(229, 241, 251);
             this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnBack.Location = new System.Drawing.Point(139, 33);
             this.btnBack.Name = "btnBack";
@@ -403,6 +388,9 @@
             // 
             // btnForward
             // 
+            this.btnForward.FlatAppearance.BorderSize = 0;
+            this.btnForward.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(204, 228, 247);
+            this.btnForward.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(229, 241, 251);
             this.btnForward.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnForward.Location = new System.Drawing.Point(163, 33);
             this.btnForward.Name = "btnForward";
@@ -427,6 +415,10 @@
             // 
             this.btnOpenFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOpenFolder.BackgroundImage = global::PartitionExplorer.Properties.Resources.open;
+            this.btnOpenFolder.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnOpenFolder.FlatAppearance.BorderSize = 0;
+            this.btnOpenFolder.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(204, 228, 247);
+            this.btnOpenFolder.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(229, 241, 251);
             this.btnOpenFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnOpenFolder.Location = new System.Drawing.Point(1070, 33);
             this.btnOpenFolder.Name = "btnOpenFolder";
@@ -439,6 +431,10 @@
             // 
             this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRefresh.BackgroundImage = global::PartitionExplorer.Properties.Resources.refresh_over;
+            this.btnRefresh.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnRefresh.FlatAppearance.BorderSize = 0;
+            this.btnRefresh.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(204, 228, 247);
+            this.btnRefresh.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(229, 241, 251);
             this.btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRefresh.Location = new System.Drawing.Point(1044, 33);
             this.btnRefresh.Name = "btnRefresh";
@@ -502,7 +498,7 @@
             this.Controls.Add(this.label1);
             this.KeyPreview = true;
             this.Name = "Form1";
-            this.Text = "Partition Explorer 1.1";
+            this.Text = "Partition Explorer 1.2";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
@@ -530,13 +526,11 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cmbPartition;
         private System.Windows.Forms.ListView lvCurrentFolder;
-        private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.CheckBox chbShowFreeSpace;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ComboBox cmbViews;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ImageList imageList2;
         private System.Windows.Forms.Button btnRefresh;
         private System.Windows.Forms.TextBox lblPath;
         private System.Windows.Forms.Button btnOpenFolder;
