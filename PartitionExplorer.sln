@@ -1,18 +1,18 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PartitionExplorer", "PartitionExplorer\PartitionExplorer.csproj", "{CEE551E6-7177-4DDC-9532-40F5A6127BE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x86 = Debug|x86
-		Release|x86 = Release|x86
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CEE551E6-7177-4DDC-9532-40F5A6127BE7}.Debug|x86.ActiveCfg = Debug|x86
-		{CEE551E6-7177-4DDC-9532-40F5A6127BE7}.Debug|x86.Build.0 = Debug|x86
-		{CEE551E6-7177-4DDC-9532-40F5A6127BE7}.Release|x86.ActiveCfg = Release|x86
-		{CEE551E6-7177-4DDC-9532-40F5A6127BE7}.Release|x86.Build.0 = Release|x86
+		{CEE551E6-7177-4DDC-9532-40F5A6127BE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEE551E6-7177-4DDC-9532-40F5A6127BE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEE551E6-7177-4DDC-9532-40F5A6127BE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEE551E6-7177-4DDC-9532-40F5A6127BE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
