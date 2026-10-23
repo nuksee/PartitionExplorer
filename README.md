@@ -8,6 +8,10 @@
   A small Windows app that shows where your disk space went.
 </p>
 
+<p align="center">
+  <a href="https://apps.microsoft.com/detail/9ndjw6b06x81"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200" alt="Get it from Microsoft"></a>
+</p>
+
 ![PartitionExplorer showing a sample folder in the Details list with the donut and treemap views](docs/screenshot.png)
 
 PartitionExplorer scans a drive or folder and lists every subfolder and file with its total size, so you can find what is filling up a partition and clean it up without leaving the app.
@@ -22,6 +26,10 @@ PartitionExplorer scans a drive or folder and lists every subfolder and file wit
 - **Explorer integration.** Tick "Add to folder right-click menu" to get an *Open in PartitionExplorer* entry on folders in Windows Explorer. It is registered for the current user only, so it needs no admin rights.
 - Junctions and symbolic links are marked as links and not followed, so nothing is counted twice. Folders that could not be fully read are flagged, since their size is a minimum.
 - A flat, clean look with its own app icon.
+
+## Install
+
+The easiest way is to get it from the [Microsoft Store](https://apps.microsoft.com/detail/9ndjw6b06x81). The Store version includes everything it needs, so you don't have to install .NET, and it updates on its own. You can also download the zip from [Releases](https://github.com/nuksee/PartitionExplorer/releases), or build it yourself as described below.
 
 ## Requirements
 
