@@ -60,7 +60,8 @@ $makepri = Join-Path $bin.FullName "x64\makepri.exe"
 
 # App files
 if (Test-Path $layout) { Remove-Item $layout -Recurse -Force }
-dotnet publish (Join-Path $root "PartitionExplorer\PartitionExplorer.csproj") -c Release -r win-x64 --self-contained true -o $layout
+# English only: the runtime's translated satellite folders would make the Store list 13 more languages
+dotnet publish (Join-Path $root "PartitionExplorer\PartitionExplorer.csproj") -c Release -r win-x64 --self-contained true -p:SatelliteResourceLanguages=en -o $layout
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed" }
 Get-ChildItem $layout -Filter *.pdb | Remove-Item
 
@@ -74,9 +75,20 @@ Set-Content (Join-Path $layout "AppxManifest.xml") $manifest -Encoding UTF8
 Copy-Item (Join-Path $pkgDir "Assets") (Join-Path $layout "Assets") -Recurse
 
 # resources.pri lets Windows pick the right logo for each scale and taskbar size
+# A single .msix only reads resources.pri, so drop the config's <packaging> section, which
+# would split scale-200 and language resources into separate files meant for bundles.
+# Index only the logos and manifest, not the app files.
 $priConfig = Join-Path $obj "priconfig.xml"
 & $makepri createconfig /cf $priConfig /dq en-US /o | Out-Null
-& $makepri new /pr $layout /cf $priConfig /mn (Join-Path $layout "AppxManifest.xml") /of (Join-Path $layout "resources.pri") /o
+$config = [xml](Get-Content $priConfig)
+$packaging = $config.SelectSingleNode("//packaging")
+if ($packaging) { [void]$packaging.ParentNode.RemoveChild($packaging); $config.Save($priConfig) }
+$priStage = Join-Path $obj "pri"
+if (Test-Path $priStage) { Remove-Item $priStage -Recurse -Force }
+New-Item -ItemType Directory $priStage | Out-Null
+Copy-Item (Join-Path $pkgDir "Assets") (Join-Path $priStage "Assets") -Recurse
+Copy-Item (Join-Path $layout "AppxManifest.xml") $priStage
+& $makepri new /pr $priStage /cf $priConfig /mn (Join-Path $priStage "AppxManifest.xml") /of (Join-Path $layout "resources.pri") /o
 if ($LASTEXITCODE -ne 0) { throw "makepri failed" }
 
 New-Item -ItemType Directory -Force $out | Out-Null
