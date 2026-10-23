@@ -34,3 +34,6 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.1.0.0")]
 [assembly: AssemblyFileVersion("1.1.0.0")]
+
+// The SDK would generate this, but GenerateAssemblyInfo is off so the attributes above stay in charge
+[assembly: System.Runtime.Versioning.SupportedOSPlatform("windows6.1")]
