@@ -34,16 +34,16 @@
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.label1 = new System.Windows.Forms.Label();
-            this.cmbPartition = new System.Windows.Forms.ComboBox();
-            this.lvCurrentFolder = new System.Windows.Forms.ListView();
+            this.cmbPartition = new PartitionExplorer.ThemedComboBox();
+            this.lvCurrentFolder = new PartitionExplorer.ThemedListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.chbShowFreeSpace = new System.Windows.Forms.CheckBox();
+            this.chbShowFreeSpace = new PartitionExplorer.ThemedCheckBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.cmbViews = new System.Windows.Forms.ComboBox();
+            this.cmbViews = new PartitionExplorer.ThemedComboBox();
             this.lblPath = new System.Windows.Forms.TextBox();
-            this.btnOpenFolder = new System.Windows.Forms.Button();
-            this.btnRefresh = new System.Windows.Forms.Button();
+            this.btnOpenFolder = new PartitionExplorer.ThemedButton();
+            this.btnRefresh = new PartitionExplorer.ThemedButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.progressScan = new System.Windows.Forms.ToolStripProgressBar();
@@ -59,15 +59,17 @@
             this.mnuDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuProperties = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnBack = new System.Windows.Forms.Button();
-            this.btnForward = new System.Windows.Forms.Button();
-            this.chbExplorerMenu = new System.Windows.Forms.CheckBox();
+            this.btnBack = new PartitionExplorer.ThemedButton();
+            this.btnForward = new PartitionExplorer.ThemedButton();
+            this.chbExplorerMenu = new PartitionExplorer.ThemedCheckBox();
             this.pnlChartMode = new System.Windows.Forms.Panel();
             this.rbDonut = new System.Windows.Forms.RadioButton();
             this.rbTreemap = new System.Windows.Forms.RadioButton();
             this.rbBoth = new System.Windows.Forms.RadioButton();
             this.splitCharts = new System.Windows.Forms.SplitContainer();
             this.treemap1 = new PartitionExplorer.TreemapControl();
+            this.lblTheme = new System.Windows.Forms.Label();
+            this.cmbTheme = new PartitionExplorer.ThemedComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -411,11 +413,35 @@
             this.chbExplorerMenu.UseVisualStyleBackColor = true;
             this.chbExplorerMenu.CheckedChanged += new System.EventHandler(this.chbExplorerMenu_CheckedChanged);
             // 
+            // lblTheme
+            // 
+            this.lblTheme.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblTheme.AutoSize = true;
+            this.lblTheme.Location = new System.Drawing.Point(924, 9);
+            this.lblTheme.Name = "lblTheme";
+            this.lblTheme.Size = new System.Drawing.Size(43, 13);
+            this.lblTheme.TabIndex = 15;
+            this.lblTheme.Text = "Theme:";
+            // 
+            // cmbTheme
+            // 
+            this.cmbTheme.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbTheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbTheme.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbTheme.FormattingEnabled = true;
+            this.cmbTheme.Items.AddRange(new object[] {
+            "System",
+            "Light",
+            "Dark"});
+            this.cmbTheme.Location = new System.Drawing.Point(971, 6);
+            this.cmbTheme.Name = "cmbTheme";
+            this.cmbTheme.Size = new System.Drawing.Size(121, 21);
+            this.cmbTheme.TabIndex = 16;
+            this.cmbTheme.SelectedIndexChanged += new System.EventHandler(this.cmbTheme_SelectedIndexChanged);
+            // 
             // btnOpenFolder
             // 
             this.btnOpenFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOpenFolder.BackgroundImage = global::PartitionExplorer.Properties.Resources.open;
-            this.btnOpenFolder.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.btnOpenFolder.FlatAppearance.BorderSize = 0;
             this.btnOpenFolder.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(204, 228, 247);
             this.btnOpenFolder.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(229, 241, 251);
@@ -430,8 +456,6 @@
             // btnRefresh
             // 
             this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRefresh.BackgroundImage = global::PartitionExplorer.Properties.Resources.refresh_over;
-            this.btnRefresh.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.btnRefresh.FlatAppearance.BorderSize = 0;
             this.btnRefresh.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(204, 228, 247);
             this.btnRefresh.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(229, 241, 251);
@@ -484,6 +508,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1100, 660);
+            this.Controls.Add(this.cmbTheme);
+            this.Controls.Add(this.lblTheme);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.chbExplorerMenu);
             this.Controls.Add(this.btnForward);
@@ -498,7 +524,7 @@
             this.Controls.Add(this.label1);
             this.KeyPreview = true;
             this.Name = "Form1";
-            this.Text = "Partition Explorer 1.2";
+            this.Text = "Partition Explorer 1.3";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
@@ -524,16 +550,16 @@
 
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox cmbPartition;
-        private System.Windows.Forms.ListView lvCurrentFolder;
-        private System.Windows.Forms.CheckBox chbShowFreeSpace;
+        private PartitionExplorer.ThemedComboBox cmbPartition;
+        private PartitionExplorer.ThemedListView lvCurrentFolder;
+        private PartitionExplorer.ThemedCheckBox chbShowFreeSpace;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.ComboBox cmbViews;
+        private PartitionExplorer.ThemedComboBox cmbViews;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.Button btnRefresh;
+        private PartitionExplorer.ThemedButton btnRefresh;
         private System.Windows.Forms.TextBox lblPath;
-        private System.Windows.Forms.Button btnOpenFolder;
+        private PartitionExplorer.ThemedButton btnOpenFolder;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel lblStatus;
         private System.Windows.Forms.ToolStripProgressBar progressScan;
@@ -549,15 +575,17 @@
         private System.Windows.Forms.ToolStripMenuItem mnuDelete;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem mnuProperties;
-        private System.Windows.Forms.Button btnBack;
-        private System.Windows.Forms.Button btnForward;
-        private System.Windows.Forms.CheckBox chbExplorerMenu;
+        private PartitionExplorer.ThemedButton btnBack;
+        private PartitionExplorer.ThemedButton btnForward;
+        private PartitionExplorer.ThemedCheckBox chbExplorerMenu;
         private System.Windows.Forms.Panel pnlChartMode;
         private System.Windows.Forms.RadioButton rbDonut;
         private System.Windows.Forms.RadioButton rbTreemap;
         private System.Windows.Forms.RadioButton rbBoth;
         private System.Windows.Forms.SplitContainer splitCharts;
         private PartitionExplorer.TreemapControl treemap1;
+        private System.Windows.Forms.Label lblTheme;
+        private PartitionExplorer.ThemedComboBox cmbTheme;
     }
 }
 

@@ -27,6 +27,7 @@ namespace PartitionExplorer
         private Stack<DirectoryInfo> backStack = new Stack<DirectoryInfo>();
         private Stack<DirectoryInfo> forwardStack = new Stack<DirectoryInfo>();
         private bool loadingSettings;
+        private bool darkMode;
 
         // Slices smaller than this share of the chart are merged into "Other"
         private const double OtherSliceThreshold = 0.03;
@@ -40,14 +41,10 @@ namespace PartitionExplorer
             Color.FromArgb(176, 122, 161), Color.FromArgb(255, 157, 167), Color.FromArgb(156, 117, 95),
             Color.FromArgb(186, 176, 172) };
         private static readonly Color OtherColor = Color.FromArgb(156, 156, 156);
-        private static readonly Color FreeColor = Color.FromArgb(222, 222, 222);
         private Dictionary<string, Color> colorMap = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase);
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
         private static extern bool SHObjectProperties(IntPtr hwnd, uint shopObjectType, string pszObjectName, string pszPropertyPage);
-
-        [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
-        private static extern int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         private static extern int GetCurrentPackageFullName(ref int packageFullNameLength, System.Text.StringBuilder packageFullName);
@@ -80,6 +77,7 @@ namespace PartitionExplorer
             scanWorker.DoWork += scanWorker_DoWork;
             scanWorker.ProgressChanged += scanWorker_ProgressChanged;
             scanWorker.RunWorkerCompleted += scanWorker_RunWorkerCompleted;
+            SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
         }
 
         #region Functions
@@ -222,6 +220,11 @@ namespace PartitionExplorer
             dp.Tag = tag;
             dp.Color = name == "Free" ? FreeColor : ColorFor(tag);
             return dp;
+        }
+
+        private Color FreeColor
+        {
+            get { return darkMode ? Color.FromArgb(70, 70, 70) : Color.FromArgb(222, 222, 222); }
         }
 
         private static string ColorKey(object tag)
@@ -627,6 +630,7 @@ namespace PartitionExplorer
                 ChartMode = settings.ChartMode;
                 if (settings.ChartSplitterDistance > 0 && settings.ChartSplitterDistance < splitCharts.Width - splitCharts.Panel2MinSize)
                     splitCharts.SplitterDistance = settings.ChartSplitterDistance;
+                cmbTheme.SelectedIndex = settings.Theme >= 0 && settings.Theme < cmbTheme.Items.Count ? settings.Theme : 0;
                 if (IsPackaged())
                     chbExplorerMenu.Visible = false;
                 else
@@ -647,6 +651,7 @@ namespace PartitionExplorer
             settings.ViewIndex = cmbViews.SelectedIndex;
             settings.ShowFreeSpace = chbShowFreeSpace.Checked;
             settings.ChartMode = ChartMode;
+            settings.Theme = (int)ThemeSetting;
             if (!splitCharts.Panel1Collapsed && !splitCharts.Panel2Collapsed)
                 settings.ChartSplitterDistance = splitCharts.SplitterDistance;
             if (currentScan != null)
@@ -654,14 +659,107 @@ namespace PartitionExplorer
             settings.Save();
         }
 
+        private ThemeMode ThemeSetting
+        {
+            get { return cmbTheme.SelectedIndex > 0 ? (ThemeMode)cmbTheme.SelectedIndex : ThemeMode.System; }
+        }
+
+        // Light puts every colour back to its default (Color.Empty), so it looks exactly as it
+        // did before there was a dark theme
+        private void ApplyTheme()
+        {
+            darkMode = Theme.IsDark(ThemeSetting);
+            Color back = darkMode ? Theme.Back : Color.Empty;
+            Color fore = darkMode ? Theme.Text : Color.Empty;
+            Color input = darkMode ? Theme.InputBack : Color.Empty;
+
+            SuspendLayout();
+            BackColor = back;
+            ForeColor = fore;
+            Theme.SetDarkTitleBar(Handle, darkMode);
+
+            lvCurrentFolder.BackColor = darkMode ? Theme.ListBack : Color.Empty;
+            lvCurrentFolder.ForeColor = fore;
+            lvCurrentFolder.DarkMode = darkMode;
+
+            lblPath.BackColor = input;
+            lblPath.ForeColor = fore;
+            Theme.SetWindowTheme(lblPath.Handle, darkMode ? "DarkMode_CFD" : null, null);
+
+            foreach (ThemedComboBox cmb in new[] { cmbPartition, cmbViews, cmbTheme })
+            {
+                cmb.BackColor = input;
+                cmb.ForeColor = fore;
+                cmb.DarkMode = darkMode;
+            }
+            foreach (ThemedCheckBox chb in new[] { chbShowFreeSpace, chbExplorerMenu })
+                chb.DarkMode = darkMode;
+
+            // The themed toggle buttons stay light whatever their BackColor, so dark mode uses flat ones
+            foreach (RadioButton rb in new[] { rbDonut, rbTreemap, rbBoth })
+            {
+                rb.FlatStyle = darkMode ? FlatStyle.Flat : FlatStyle.Standard;
+                rb.BackColor = input;
+                rb.UseVisualStyleBackColor = !darkMode;
+                rb.FlatAppearance.BorderColor = Theme.Border;
+                rb.FlatAppearance.CheckedBackColor = Theme.Accent;
+                rb.FlatAppearance.MouseOverBackColor = Theme.Hover;
+                rb.FlatAppearance.MouseDownBackColor = Theme.Pressed;
+            }
+
+            foreach (ThemedButton btn in new[] { btnBack, btnForward, btnRefresh, btnOpenFolder })
+            {
+                btn.BackColor = back;
+                btn.UseVisualStyleBackColor = !darkMode;
+                btn.DarkMode = darkMode;
+                btn.FlatAppearance.MouseOverBackColor = darkMode ? Theme.Hover : Color.FromArgb(229, 241, 251);
+                btn.FlatAppearance.MouseDownBackColor = darkMode ? Theme.Pressed : Color.FromArgb(204, 228, 247);
+            }
+            Color glyph = darkMode ? Theme.Text : Color.FromArgb(64, 64, 64);
+            SetButtonImage(btnRefresh, FlatIcons.RefreshGlyph(LogicalToDeviceUnits(16), glyph));
+            SetButtonImage(btnOpenFolder, FlatIcons.OpenGlyph(LogicalToDeviceUnits(16), glyph));
+
+            if (darkMode)
+            {
+                ToolStripRenderer renderer = new DarkToolStripRenderer();
+                statusStrip1.Renderer = renderer;
+                ctxItem.Renderer = renderer;
+            }
+            else
+            {
+                statusStrip1.RenderMode = ToolStripRenderMode.ManagerRenderMode;
+                ctxItem.RenderMode = ToolStripRenderMode.ManagerRenderMode;
+            }
+            lnkCancel.LinkColor = darkMode ? Theme.Link : Color.Empty;
+            lnkCancel.ActiveLinkColor = darkMode ? Theme.Link : Color.Empty;
+
+            treemap1.BackColor = darkMode ? Theme.Back : Color.White;
+            treemap1.DarkMode = darkMode;
+            Series series = chart1.Series[0];
+            series.BorderColor = darkMode ? Theme.Back : Color.White;
+            series.LabelForeColor = darkMode ? Theme.Text : Color.Black;
+            chart1.Legends[0].ForeColor = series.LabelForeColor;
+            chart1.Legends[0].BackColor = treemap1.BackColor;
+            chart1.ChartAreas[0].BackColor = treemap1.BackColor;
+            // Rebinds so the free space slice picks up its new colour
+            if (currentScan != null)
+                BindChart(currentScan);
+            ResumeLayout();
+        }
+
+        private static void SetButtonImage(Button btn, Image image)
+        {
+            Image old = btn.Image;
+            btn.Image = image;
+            if (old != null)
+                old.Dispose();
+        }
+
         #endregion
 
         #region Control Events
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Same list styling as File Explorer: light hover and selection, flat headers
-            SetWindowTheme(lvCurrentFolder.Handle, "Explorer", null);
-
             Dictionary<String, View> views = new Dictionary<string, View>();
             views.Add(View.Details.ToString(), View.Details);
             views.Add(View.LargeIcon.ToString(), View.LargeIcon);
@@ -686,6 +784,7 @@ namespace PartitionExplorer
             }
 
             LoadSettings();
+            ApplyTheme();
             UpdateNavButtons();
             NavigateTo(new DirectoryInfo(path_));
         }
@@ -721,6 +820,20 @@ namespace PartitionExplorer
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             lvCurrentFolder.View = ((System.Collections.Generic.KeyValuePair<string, System.Windows.Forms.View>)(cmbViews.SelectedValue)).Value;
+            lvCurrentFolder.UpdateTheme();
+        }
+
+        private void cmbTheme_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingSettings)
+                ApplyTheme();
+        }
+
+        // Follows Windows switching between light and dark while the app is open
+        private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
+        {
+            if (e.Category == UserPreferenceCategory.General && ThemeSetting == ThemeMode.System && IsHandleCreated)
+                BeginInvoke((Action)ApplyTheme);
         }
 
         private void lvCurrentFolder_DoubleClick(object sender, EventArgs e)
@@ -939,6 +1052,8 @@ namespace PartitionExplorer
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // A static event, so it would otherwise keep the form alive
+            SystemEvents.UserPreferenceChanged -= SystemEvents_UserPreferenceChanged;
             pendingScan = null;
             scanWorker.CancelAsync();
             try
