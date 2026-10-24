@@ -35,6 +35,7 @@ namespace PartitionExplorer
         private long total;
         private object selectedTag;
         private Box hoverBox;
+        private bool darkMode;
         private ToolTip toolTip = new ToolTip();
 
         public event EventHandler<object> ItemClicked;
@@ -56,6 +57,18 @@ namespace PartitionExplorer
             hoverBox = null;
             UpdateLayout();
             Invalidate();
+        }
+
+        // Subfolder boxes are blended towards BackColor, so they come out lighter than their
+        // parent on white and darker on a dark background; dark mode switches the text to suit
+        public bool DarkMode
+        {
+            get { return darkMode; }
+            set
+            {
+                darkMode = value;
+                Invalidate();
+            }
         }
 
         public object SelectedTag
@@ -170,13 +183,13 @@ namespace PartitionExplorer
             g.Clear(BackColor);
             if (boxes.Count == 0)
             {
-                TextRenderer.DrawText(g, "Nothing to show", Font, ClientRectangle, SystemColors.GrayText,
+                TextRenderer.DrawText(g, "Nothing to show", Font, ClientRectangle, darkMode ? Theme.DimText : SystemColors.GrayText,
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
                 return;
             }
 
             using (Font bold = new Font(Font, FontStyle.Bold))
-            using (Pen white = new Pen(Color.White, 2))
+            using (Pen gap = new Pen(BackColor, 2))
             {
                 foreach (Box b in boxes)
                 {
@@ -185,7 +198,7 @@ namespace PartitionExplorer
                     {
                         using (SolidBrush fill = new SolidBrush(b.Item.Color))
                             g.FillRectangle(fill, r);
-                        g.DrawRectangle(white, r);
+                        g.DrawRectangle(gap, r);
                         if (!ChildArea(b.Rect).IsEmpty)
                             DrawLabel(g, b.Item.Name + " · " + Form1.FormatSize(b.Item.Size), bold, Color.White,
                                 new Rectangle(r.X + 4, r.Y + 2, r.Width - 8, HeaderHeight - 2));
@@ -195,14 +208,19 @@ namespace PartitionExplorer
                     else
                     {
                         int index = b.Parent.Children.IndexOf(b.Item);
-                        using (SolidBrush fill = new SolidBrush(Tint(b.Parent.Color, 0.2f + 0.12f * (index % 3))))
+                        // Pushed further on dark, where the bright palette colours need to come down more
+                        float amount = (darkMode ? 0.35f : 0.2f) + 0.12f * (index % 3);
+                        Color color = Blend(b.Parent.Color, BackColor, amount);
+                        using (SolidBrush fill = new SolidBrush(color))
                             g.FillRectangle(fill, r);
                         using (Pen edge = new Pen(b.Parent.Color))
                             g.DrawRectangle(edge, r);
                         if (r.Width > 50 && r.Height > Font.Height * 2 + 4)
                         {
-                            DrawLabel(g, b.Item.Name, Font, Color.Black, new Rectangle(r.X + 3, r.Y + 2, r.Width - 6, Font.Height));
-                            DrawLabel(g, Form1.FormatSize(b.Item.Size), Font, Color.DimGray,
+                            bool lightText = darkMode && Luma(color) < 0.55;
+                            Color sizeColor = lightText ? Color.FromArgb(200, 200, 200) : darkMode ? Color.FromArgb(50, 50, 50) : Color.DimGray;
+                            DrawLabel(g, b.Item.Name, Font, lightText ? Theme.Text : Color.Black, new Rectangle(r.X + 3, r.Y + 2, r.Width - 6, Font.Height));
+                            DrawLabel(g, Form1.FormatSize(b.Item.Size), Font, sizeColor,
                                 new Rectangle(r.X + 3, r.Y + 2 + Font.Height, r.Width - 6, Font.Height));
                         }
                     }
@@ -212,12 +230,12 @@ namespace PartitionExplorer
             Box selected = boxes.FirstOrDefault(b => b.Parent == null && selectedTag != null && b.Item.Tag != null && TagEquals(b.Item.Tag, selectedTag));
             if (selected != null)
             {
-                using (Pen outline = new Pen(Color.FromArgb(17, 17, 17), 3) { Alignment = PenAlignment.Inset })
+                using (Pen outline = new Pen(darkMode ? Color.White : Color.FromArgb(17, 17, 17), 3) { Alignment = PenAlignment.Inset })
                     g.DrawRectangle(outline, Rectangle.Round(selected.Rect));
             }
             if (hoverBox != null && hoverBox.Item.Tag is System.IO.DirectoryInfo)
             {
-                using (Pen hover = new Pen(Color.FromArgb(160, Color.Black), 1) { DashStyle = DashStyle.Dash })
+                using (Pen hover = new Pen(Color.FromArgb(160, darkMode ? Color.White : Color.Black), 1) { DashStyle = DashStyle.Dash })
                     g.DrawRectangle(hover, Rectangle.Round(hoverBox.Rect));
             }
         }
@@ -230,12 +248,17 @@ namespace PartitionExplorer
                 TextFormatFlags.Left | TextFormatFlags.Top | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix | TextFormatFlags.SingleLine);
         }
 
-        private static Color Tint(Color c, float amount)
+        private static double Luma(Color c)
+        {
+            return (0.299 * c.R + 0.587 * c.G + 0.114 * c.B) / 255;
+        }
+
+        private static Color Blend(Color c, Color toward, float amount)
         {
             return Color.FromArgb(
-                (int)(c.R + (255 - c.R) * amount),
-                (int)(c.G + (255 - c.G) * amount),
-                (int)(c.B + (255 - c.B) * amount));
+                (int)(c.R + (toward.R - c.R) * amount),
+                (int)(c.G + (toward.G - c.G) * amount),
+                (int)(c.B + (toward.B - c.B) * amount));
         }
 
         // Subfolder boxes sit on top of their parent, so search them first

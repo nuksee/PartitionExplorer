@@ -28,6 +28,38 @@ namespace PartitionExplorer
             return list;
         }
 
+        // Monochrome toolbar glyphs, drawn in the theme's text colour
+        public static Bitmap RefreshGlyph(int size, Color color)
+        {
+            return Draw(size, (g, u, s) =>
+            {
+                using (Pen pen = new Pen(color, 1.4f * u))
+                using (SolidBrush brush = new SolidBrush(color))
+                {
+                    // Clockwise from the upper right round to the top, then an arrowhead
+                    g.DrawArc(pen, 2.6f * u, 2.6f * u, 10.8f * u, 10.8f * u, -30, 300);
+                    g.FillPolygon(brush, new[] {
+                        new PointF(10.6f * u, 2.6f * u), new PointF(7.4f * u, 0.4f * u), new PointF(7.4f * u, 4.8f * u) });
+                }
+            });
+        }
+
+        public static Bitmap OpenGlyph(int size, Color color)
+        {
+            return Draw(size, (g, u, s) =>
+            {
+                using (Pen pen = new Pen(color, 1.4f * u) { StartCap = LineCap.Round, EndCap = LineCap.Round, LineJoin = LineJoin.Round })
+                {
+                    // A box left open at the top right, and an arrow leaving through the gap
+                    g.DrawLines(pen, new[] {
+                        new PointF(7 * u, 3 * u), new PointF(2.5f * u, 3 * u), new PointF(2.5f * u, 13.5f * u),
+                        new PointF(13 * u, 13.5f * u), new PointF(13 * u, 9 * u) });
+                    g.DrawLine(pen, 7.5f * u, 8.5f * u, 13.5f * u, 2.5f * u);
+                    g.DrawLines(pen, new[] { new PointF(9.5f * u, 2.5f * u), new PointF(13.5f * u, 2.5f * u), new PointF(13.5f * u, 6.5f * u) });
+                }
+            });
+        }
+
         private delegate void Painter(Graphics g, float u, int size);
 
         // Shapes are laid out on a 16x16 grid and scaled by u
