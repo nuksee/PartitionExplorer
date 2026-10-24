@@ -524,7 +524,7 @@
             this.Controls.Add(this.label1);
             this.KeyPreview = true;
             this.Name = "Form1";
-            this.Text = "Partition Explorer 1.2";
+            this.Text = "Partition Explorer 1.3";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
