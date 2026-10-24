@@ -38,7 +38,15 @@ PartitionExplorer scans a drive or folder and lists every subfolder and file wit
 
 ## Install
 
-The easiest way is to get it from the [Microsoft Store](https://apps.microsoft.com/detail/9ndjw6b06x81). The Store version includes everything it needs, so you don't have to install .NET, and it updates on its own. You can also download the zip from [Releases](https://github.com/nuksee/PartitionExplorer/releases), or build it yourself as described below.
+The easiest way is to get it from the [Microsoft Store](https://apps.microsoft.com/detail/9ndjw6b06x81). The Store version includes everything it needs, so you don't have to install .NET, and it updates on its own.
+
+To install the Store version from a terminal with winget:
+
+```
+winget install 9NDJW6B06X81 -s msstore
+```
+
+You can also download the zip from [Releases](https://github.com/nuksee/PartitionExplorer/releases), or build it yourself as described below.
 
 ## Requirements
 
