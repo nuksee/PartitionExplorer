@@ -739,6 +739,8 @@ namespace PartitionExplorer
             series.BorderColor = darkMode ? Theme.Back : Color.White;
             series.LabelForeColor = darkMode ? Theme.Text : Color.Black;
             chart1.Legends[0].ForeColor = series.LabelForeColor;
+            chart1.Legends[0].BackColor = treemap1.BackColor;
+            chart1.ChartAreas[0].BackColor = treemap1.BackColor;
             // Rebinds so the free space slice picks up its new colour
             if (currentScan != null)
                 BindChart(currentScan);
