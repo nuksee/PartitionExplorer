@@ -16,6 +16,15 @@
 
 PartitionExplorer scans a drive or folder and lists every subfolder and file with its total size, so you can find what is filling up a partition and clean it up without leaving the app.
 
+## More screenshots
+
+| | |
+|---|---|
+| ![Treemap view](docs/screenshots/02-treemap.png) | ![Donut view with free space](docs/screenshots/03-donut.png) |
+| The treemap on its own. Big folders show their subfolders inside. | The donut on a drive root, with the partition's free space shown. |
+| ![A subfolder in Both view](docs/screenshots/04-subfolder.png) | ![Right-click menu on a folder](docs/screenshots/05-context-menu.png) |
+| Inside a subfolder. Back takes you to where you were. | The right-click menu on an item. |
+
 ## Features
 
 - **Details list** with Name, Size, %, Items and Modified columns. Click a column header to sort, and click it again to flip the order.
