@@ -74,3 +74,7 @@ PartitionExplorer.exe "D:\Downloads"
 ```
 
 To give the app to someone else, copy the **whole** `net8.0-windows` folder, not just the exe: `PartitionExplorer.dll` and the chart library next to it are needed too. The other person needs the .NET 8 Desktop Runtime installed; if it is missing, Windows shows a link to download it when the app starts.
+
+## License
+
+PartitionExplorer is released under the [MIT License](LICENSE).
