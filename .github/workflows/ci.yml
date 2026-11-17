@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build
+        run: dotnet build PartitionExplorer.sln -c Release -warnaserror
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: PartitionExplorer-${{ github.sha }}
+          path: |
+            PartitionExplorer/bin/Release/net8.0-windows/
+            !PartitionExplorer/bin/Release/net8.0-windows/*.pdb
+          retention-days: 14
