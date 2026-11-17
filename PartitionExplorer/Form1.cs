@@ -717,6 +717,9 @@ namespace PartitionExplorer
             Color glyph = darkMode ? Theme.Text : Color.FromArgb(64, 64, 64);
             SetButtonImage(btnRefresh, FlatIcons.RefreshGlyph(LogicalToDeviceUnits(16), glyph));
             SetButtonImage(btnOpenFolder, FlatIcons.OpenGlyph(LogicalToDeviceUnits(16), glyph));
+            Color disabledGlyph = darkMode ? Theme.DisabledText : Color.FromArgb(190, 190, 190);
+            SetNavButtonImages(btnBack, glyph, disabledGlyph, false);
+            SetNavButtonImages(btnForward, glyph, disabledGlyph, true);
 
             if (darkMode)
             {
@@ -744,6 +747,15 @@ namespace PartitionExplorer
             if (currentScan != null)
                 BindChart(currentScan);
             ResumeLayout();
+        }
+
+        private void SetNavButtonImages(ThemedButton btn, Color glyph, Color disabledGlyph, bool right)
+        {
+            SetButtonImage(btn, FlatIcons.ArrowGlyph(LogicalToDeviceUnits(16), glyph, right));
+            Image old = btn.DisabledImage;
+            btn.DisabledImage = FlatIcons.ArrowGlyph(LogicalToDeviceUnits(16), disabledGlyph, right);
+            if (old != null)
+                old.Dispose();
         }
 
         private static void SetButtonImage(Button btn, Image image)
@@ -883,7 +895,7 @@ namespace PartitionExplorer
                 e.Handled = true;
             }
             // Same shortcuts as File Explorer for typing a path
-            else if ((e.Control && e.KeyCode == Keys.L) || (e.Alt && e.KeyCode == Keys.D) || e.KeyCode == Keys.F4)
+            else if ((e.Control && e.KeyCode == Keys.L) || (e.Alt && e.KeyCode == Keys.D) || (e.Modifiers == Keys.None && e.KeyCode == Keys.F4))
             {
                 pathBar.BeginEdit();
                 e.SuppressKeyPress = true;

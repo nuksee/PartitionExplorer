@@ -383,7 +383,7 @@
             this.btnBack.Name = "btnBack";
             this.btnBack.Size = new System.Drawing.Size(22, 22);
             this.btnBack.TabIndex = 12;
-            this.btnBack.Text = "\u25C0";
+            this.btnBack.AccessibleName = "Back";
             this.btnBack.UseVisualStyleBackColor = true;
             this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
@@ -397,7 +397,7 @@
             this.btnForward.Name = "btnForward";
             this.btnForward.Size = new System.Drawing.Size(22, 22);
             this.btnForward.TabIndex = 13;
-            this.btnForward.Text = "\u25B6";
+            this.btnForward.AccessibleName = "Forward";
             this.btnForward.UseVisualStyleBackColor = true;
             this.btnForward.Click += new System.EventHandler(this.btnForward_Click);
             // 
