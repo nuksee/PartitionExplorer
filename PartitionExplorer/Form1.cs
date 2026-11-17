@@ -70,6 +70,7 @@ namespace PartitionExplorer
             if (path_ == "") path_ =Microsoft.VisualBasic.FileIO.SpecialDirectories.MyDocuments;
 
             treemap1.TagEquals = SameTag;
+            pathBar.ReturnFocusTo = lvCurrentFolder;
             lvCurrentFolder.SmallImageList = FlatIcons.Create(LogicalToDeviceUnits(16));
             lvCurrentFolder.LargeImageList = FlatIcons.Create(LogicalToDeviceUnits(32));
             scanWorker.WorkerReportsProgress = true;
@@ -85,7 +86,7 @@ namespace PartitionExplorer
         {
             DirectoryInfo DI = scan.Folder;
             lvCurrentFolder.Tag = DI;
-            lblPath.Text = DI.FullName;
+            pathBar.FolderPath = DI.FullName;
             lvCurrentFolder.BeginUpdate();
             try
             {
@@ -682,9 +683,7 @@ namespace PartitionExplorer
             lvCurrentFolder.ForeColor = fore;
             lvCurrentFolder.DarkMode = darkMode;
 
-            lblPath.BackColor = input;
-            lblPath.ForeColor = fore;
-            Theme.SetWindowTheme(lblPath.Handle, darkMode ? "DarkMode_CFD" : null, null);
+            pathBar.DarkMode = darkMode;
 
             foreach (ThemedComboBox cmb in new[] { cmbPartition, cmbViews, cmbTheme })
             {
@@ -883,6 +882,12 @@ namespace PartitionExplorer
                 GoUp();
                 e.Handled = true;
             }
+            // Same shortcuts as File Explorer for typing a path
+            else if ((e.Control && e.KeyCode == Keys.L) || (e.Alt && e.KeyCode == Keys.D) || e.KeyCode == Keys.F4)
+            {
+                pathBar.BeginEdit();
+                e.SuppressKeyPress = true;
+            }
         }
 
         private void btnBack_Click(object sender, EventArgs e)
@@ -895,23 +900,18 @@ namespace PartitionExplorer
             GoForward();
         }
 
-        private void lblPath_KeyDown(object sender, KeyEventArgs e)
+        // A clicked segment, or a path typed after clicking the bar. A typo keeps the bar in
+        // typing mode so it can be fixed.
+        private void pathBar_NavigateRequested(object sender, string text)
         {
-            if (e.KeyCode == Keys.Enter)
+            string path = Environment.ExpandEnvironmentVariables(text.Trim().Trim('"'));
+            if (Directory.Exists(path))
             {
-                e.SuppressKeyPress = true;
-                string path = Environment.ExpandEnvironmentVariables(lblPath.Text.Trim().Trim('"'));
-                if (Directory.Exists(path))
-                    NavigateTo(new DirectoryInfo(path));
-                else
-                    lblStatus.Text = "Folder not found: " + path;
+                pathBar.EndEdit();
+                NavigateTo(new DirectoryInfo(path));
             }
-            else if (e.KeyCode == Keys.Escape)
-            {
-                e.SuppressKeyPress = true;
-                if (currentScan != null)
-                    lblPath.Text = currentScan.Folder.FullName;
-            }
+            else
+                lblStatus.Text = "Folder not found: " + path;
         }
 
         private void chart1_MouseClick(object sender, MouseEventArgs e)

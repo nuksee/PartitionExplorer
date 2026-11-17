@@ -41,7 +41,7 @@
             this.chbShowFreeSpace = new PartitionExplorer.ThemedCheckBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.cmbViews = new PartitionExplorer.ThemedComboBox();
-            this.lblPath = new System.Windows.Forms.TextBox();
+            this.pathBar = new PartitionExplorer.BreadcrumbBar();
             this.btnOpenFolder = new PartitionExplorer.ThemedButton();
             this.btnRefresh = new PartitionExplorer.ThemedButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -363,16 +363,15 @@
             this.cmbViews.TabIndex = 7;
             this.cmbViews.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
-            // lblPath
+            // pathBar
             // 
-            this.lblPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.pathBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblPath.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lblPath.Location = new System.Drawing.Point(189, 34);
-            this.lblPath.Name = "lblPath";
-            this.lblPath.Size = new System.Drawing.Size(851, 20);
-            this.lblPath.TabIndex = 9;
-            this.lblPath.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lblPath_KeyDown);
+            this.pathBar.Location = new System.Drawing.Point(189, 33);
+            this.pathBar.Name = "pathBar";
+            this.pathBar.Size = new System.Drawing.Size(851, 22);
+            this.pathBar.TabIndex = 9;
+            this.pathBar.NavigateRequested += new System.EventHandler<string>(this.pathBar_NavigateRequested);
             // 
             // btnBack
             // 
@@ -515,7 +514,7 @@
             this.Controls.Add(this.btnForward);
             this.Controls.Add(this.btnBack);
             this.Controls.Add(this.btnOpenFolder);
-            this.Controls.Add(this.lblPath);
+            this.Controls.Add(this.pathBar);
             this.Controls.Add(this.btnRefresh);
             this.Controls.Add(this.cmbViews);
             this.Controls.Add(this.splitContainer1);
@@ -558,7 +557,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private PartitionExplorer.ThemedButton btnRefresh;
-        private System.Windows.Forms.TextBox lblPath;
+        private PartitionExplorer.BreadcrumbBar pathBar;
         private PartitionExplorer.ThemedButton btnOpenFolder;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel lblStatus;
