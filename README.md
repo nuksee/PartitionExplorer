@@ -73,6 +73,19 @@ The app lands in `PartitionExplorer\bin\Release\net8.0-windows\`. You can also o
 
 To try the package locally, turn on Developer Mode (Settings > System > For developers) and run `.\packaging\build-msix.ps1 -Register`. The Store build doesn't offer the folder right-click menu checkbox, because packaged apps can't write that registry entry.
 
+### Continuous integration and releases
+
+GitHub Actions builds every push to `master` and every pull request (`.github/workflows/ci.yml`). The built app is attached to each run under **Artifacts**.
+
+To release, bump the version in `PartitionExplorer\Properties\AssemblyInfo.cs`, merge, then push a matching tag:
+
+```
+git tag v1.3
+git push origin v1.3
+```
+
+`.github/workflows/release.yml` then builds the zip and the Store MSIX and attaches both to a draft release. Edit the notes and publish the draft on GitHub. The MSIX still needs to be uploaded to Partner Center by hand.
+
 ## Running and sharing
 
 Start `PartitionExplorer.exe` from the release folder. To open a specific folder right away, pass it on the command line:
