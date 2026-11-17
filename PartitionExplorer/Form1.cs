@@ -707,7 +707,7 @@ namespace PartitionExplorer
                 rb.FlatAppearance.MouseDownBackColor = Theme.Pressed;
             }
 
-            foreach (ThemedButton btn in new[] { btnBack, btnForward, btnRefresh, btnOpenFolder })
+            foreach (ThemedButton btn in new[] { btnBack, btnForward, btnRefresh, btnOpenFolder, btnHelp })
             {
                 btn.BackColor = back;
                 btn.UseVisualStyleBackColor = !darkMode;
@@ -724,11 +724,13 @@ namespace PartitionExplorer
                 ToolStripRenderer renderer = new DarkToolStripRenderer();
                 statusStrip1.Renderer = renderer;
                 ctxItem.Renderer = renderer;
+                ctxHelp.Renderer = renderer;
             }
             else
             {
                 statusStrip1.RenderMode = ToolStripRenderMode.ManagerRenderMode;
                 ctxItem.RenderMode = ToolStripRenderMode.ManagerRenderMode;
+                ctxHelp.RenderMode = ToolStripRenderMode.ManagerRenderMode;
             }
             lnkCancel.LinkColor = darkMode ? Theme.Link : Color.Empty;
             lnkCancel.ActiveLinkColor = darkMode ? Theme.Link : Color.Empty;
@@ -947,6 +949,41 @@ namespace PartitionExplorer
             if (hit.PointIndex < 0 || hit.PointIndex >= chart1.Series[0].Points.Count)
                 return null;
             return chart1.Series[0].Points[hit.PointIndex].Tag as DirectoryInfo;
+        }
+
+        private const string StoreReviewUri = "ms-windows-store://review/?ProductId=9NDJW6B06X81";
+        private const string StorePageUrl = "https://apps.microsoft.com/detail/9ndjw6b06x81";
+        private const string GitHubUrl = "https://github.com/nuksee/PartitionExplorer";
+
+        private void btnHelp_Click(object sender, EventArgs e)
+        {
+            ctxHelp.Show(btnHelp, new Point(0, btnHelp.Height));
+        }
+
+        private void mnuRateReview_Click(object sender, EventArgs e)
+        {
+            // Opens the Store app straight at the review form; the web page is the fallback
+            // where the Store app is missing or blocked
+            if (!OpenLink(StoreReviewUri))
+                OpenLink(StorePageUrl);
+        }
+
+        private void mnuGitHub_Click(object sender, EventArgs e)
+        {
+            OpenLink(GitHubUrl);
+        }
+
+        private static bool OpenLink(string target)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(target) { UseShellExecute = true });
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         private void ctxItem_Opening(object sender, CancelEventArgs e)
