@@ -30,7 +30,7 @@ PartitionExplorer scans a drive or folder and lists every subfolder and file wit
 - **Details list** with Name, Size, %, Items and Modified columns. Click a column header to sort, and click it again to flip the order.
 - **Background scanning.** The window stays responsive while folders are measured, the status bar shows what is being scanned, and a scan can be cancelled at any time. Sizes are cached, so going back to a folder you already scanned is instant.
 - **Donut and treemap views** of the current folder. Pick Donut, Treemap or Both, and optionally show the partition's free space. Click a slice or a box to open that folder.
-- **Navigation** like Explorer: Back and Forward buttons, a path box you can type into, and the usual keys (Backspace or Alt+Up for the parent folder, Alt+Left and Alt+Right for back and forward, Enter to open, Delete to recycle).
+- **Navigation** like Explorer: Back and Forward buttons, a breadcrumb path bar (click a folder to jump to it, or click empty space or press Ctrl+L to type a path), and the usual keys (Backspace or Alt+Up for the parent folder, Alt+Left and Alt+Right for back and forward, Enter to open, Delete to recycle).
 - **Right-click menu** on any item: Open, Show in Explorer, Copy path, Delete to Recycle Bin and Properties.
 - **Explorer integration.** Tick "Add to folder right-click menu" to get an *Open in PartitionExplorer* entry on folders in Windows Explorer. It is registered for the current user only, so it needs no admin rights.
 - Junctions and symbolic links are marked as links and not followed, so nothing is counted twice. Folders that could not be fully read are flagged, since their size is a minimum.

@@ -59,19 +59,5 @@ namespace PartitionExplorer.Properties {
                 resourceCulture = value;
             }
         }
-        
-        internal static System.Drawing.Bitmap open {
-            get {
-                object obj = ResourceManager.GetObject("open", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap refresh_over {
-            get {
-                object obj = ResourceManager.GetObject("refresh_over", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
     }
 }

@@ -229,10 +229,22 @@ namespace PartitionExplorer
     }
 
     // A disabled flat button draws its text in a darker shade of BackColor, which can't be
-    // seen on a dark background, so dark mode draws it dimmed instead
+    // seen on a dark background, so dark mode draws it dimmed instead. Its image gets an
+    // embossed look when disabled, so a DisabledImage, if set, is drawn in its place.
     public class ThemedButton : Button
     {
         private bool darkMode;
+        private Image disabledImage;
+
+        public Image DisabledImage
+        {
+            get { return disabledImage; }
+            set
+            {
+                disabledImage = value;
+                Invalidate();
+            }
+        }
 
         public bool DarkMode
         {
@@ -247,6 +259,14 @@ namespace PartitionExplorer
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
+            if (!Enabled && Image != null && disabledImage != null)
+            {
+                using (SolidBrush back = new SolidBrush(BackColor))
+                    e.Graphics.FillRectangle(back, ClientRectangle);
+                e.Graphics.DrawImage(disabledImage, (Width - disabledImage.Width) / 2, (Height - disabledImage.Height) / 2,
+                    disabledImage.Width, disabledImage.Height);
+                return;
+            }
             if (!darkMode || Enabled || Image != null)
                 return;
             using (SolidBrush back = new SolidBrush(BackColor))

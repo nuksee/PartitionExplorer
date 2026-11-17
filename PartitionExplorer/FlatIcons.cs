@@ -44,6 +44,24 @@ namespace PartitionExplorer
             });
         }
 
+        // A plain arrow pointing left (back) or right (forward), in the same strokes as the others
+        public static Bitmap ArrowGlyph(int size, Color color, bool right)
+        {
+            return Draw(size, (g, u, s) =>
+            {
+                if (right)
+                {
+                    g.TranslateTransform(16 * u, 0);
+                    g.ScaleTransform(-1, 1);
+                }
+                using (Pen pen = new Pen(color, 1.4f * u) { StartCap = LineCap.Round, EndCap = LineCap.Round, LineJoin = LineJoin.Round })
+                {
+                    g.DrawLine(pen, 3 * u, 8 * u, 13 * u, 8 * u);
+                    g.DrawLines(pen, new[] { new PointF(7.5f * u, 3.5f * u), new PointF(3 * u, 8 * u), new PointF(7.5f * u, 12.5f * u) });
+                }
+            });
+        }
+
         public static Bitmap OpenGlyph(int size, Color color)
         {
             return Draw(size, (g, u, s) =>
