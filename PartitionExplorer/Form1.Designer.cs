@@ -70,6 +70,10 @@
             this.treemap1 = new PartitionExplorer.TreemapControl();
             this.lblTheme = new System.Windows.Forms.Label();
             this.cmbTheme = new PartitionExplorer.ThemedComboBox();
+            this.btnHelp = new PartitionExplorer.ThemedButton();
+            this.ctxHelp = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.mnuRateReview = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuGitHub = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -82,6 +86,7 @@
             this.splitCharts.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.ctxItem.SuspendLayout();
+            this.ctxHelp.SuspendLayout();
             this.SuspendLayout();
             // 
             // chart1
@@ -439,6 +444,43 @@
             this.cmbTheme.TabIndex = 16;
             this.cmbTheme.SelectedIndexChanged += new System.EventHandler(this.cmbTheme_SelectedIndexChanged);
             // 
+            // btnHelp
+            // 
+            this.btnHelp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnHelp.FlatAppearance.BorderSize = 0;
+            this.btnHelp.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(204, 228, 247);
+            this.btnHelp.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(229, 241, 251);
+            this.btnHelp.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnHelp.Location = new System.Drawing.Point(856, 5);
+            this.btnHelp.Name = "btnHelp";
+            this.btnHelp.Size = new System.Drawing.Size(56, 22);
+            this.btnHelp.TabIndex = 17;
+            this.btnHelp.Text = "Help \u25BE";
+            this.btnHelp.UseVisualStyleBackColor = true;
+            this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
+            // 
+            // ctxHelp
+            // 
+            this.ctxHelp.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuRateReview,
+            this.mnuGitHub});
+            this.ctxHelp.Name = "ctxHelp";
+            this.ctxHelp.Size = new System.Drawing.Size(251, 48);
+            // 
+            // mnuRateReview
+            // 
+            this.mnuRateReview.Name = "mnuRateReview";
+            this.mnuRateReview.Size = new System.Drawing.Size(250, 22);
+            this.mnuRateReview.Text = "Rate and review in Microsoft Store";
+            this.mnuRateReview.Click += new System.EventHandler(this.mnuRateReview_Click);
+            // 
+            // mnuGitHub
+            // 
+            this.mnuGitHub.Name = "mnuGitHub";
+            this.mnuGitHub.Size = new System.Drawing.Size(250, 22);
+            this.mnuGitHub.Text = "Project page on GitHub";
+            this.mnuGitHub.Click += new System.EventHandler(this.mnuGitHub_Click);
+            // 
             // btnOpenFolder
             // 
             this.btnOpenFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -508,6 +550,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1100, 660);
+            this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.cmbTheme);
             this.Controls.Add(this.lblTheme);
             this.Controls.Add(this.statusStrip1);
@@ -541,6 +584,7 @@
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.ctxItem.ResumeLayout(false);
+            this.ctxHelp.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -586,6 +630,10 @@
         private PartitionExplorer.TreemapControl treemap1;
         private System.Windows.Forms.Label lblTheme;
         private PartitionExplorer.ThemedComboBox cmbTheme;
+        private PartitionExplorer.ThemedButton btnHelp;
+        private System.Windows.Forms.ContextMenuStrip ctxHelp;
+        private System.Windows.Forms.ToolStripMenuItem mnuRateReview;
+        private System.Windows.Forms.ToolStripMenuItem mnuGitHub;
     }
 }
 
