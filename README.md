@@ -24,6 +24,8 @@ PartitionExplorer scans a drive or folder and lists every subfolder and file wit
 | The treemap on its own. Big folders show their subfolders inside. | The donut on a drive root, with the partition's free space shown. |
 | ![A subfolder in Both view](docs/screenshots/04-subfolder.png) | ![Right-click menu on a folder](docs/screenshots/05-context-menu.png) |
 | Inside a subfolder. Back takes you to where you were. | The right-click menu on an item. |
+| ![Both view in the dark theme](docs/screenshots/06-dark.png) | |
+| The dark theme. Pick System, Light or Dark from the Theme drop-down. | |
 
 ## Features
 
